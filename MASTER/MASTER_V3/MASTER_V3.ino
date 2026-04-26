@@ -29,4 +29,5 @@ void loop() {
       HOME_ALL();
     }
   }
+  Serial.println("TES");
 }
