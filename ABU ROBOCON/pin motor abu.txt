@@ -1,0 +1,4 @@
+dpk 7 4
+knb 5 2
+krb 9 6
+krd 16 12

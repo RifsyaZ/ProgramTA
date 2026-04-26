@@ -1,0 +1,91 @@
+
+#include <Wire.h>
+
+/* ===== PIN MOTOR ===== */
+#define knd1 12
+#define knd2 10
+#define knb1 4
+#define knb2 2
+#define krb1 5
+#define krb2 3
+#define krd1 44
+#define krd2 46
+
+
+#define I2C_ADDR 0x08
+#define DEADZONE 10
+#define MAXPWM 255
+
+volatile int8_t lx = 0, ly = 0, rx = 0;
+
+void setup() {
+  Serial.begin(115200);
+
+  pinMode(knd1, OUTPUT); pinMode(knd2, OUTPUT);
+  pinMode(knb1, OUTPUT); pinMode(knb2, OUTPUT);
+  pinMode(krb1, OUTPUT); pinMode(krb2, OUTPUT);
+  pinMode(krd1, OUTPUT); pinMode(krd2, OUTPUT);
+
+  Wire.begin(I2C_ADDR);        // Mega sebagai SLAVE
+  Wire.onReceive(receiveEvent);
+
+  stopMotor();
+}
+
+void loop() {
+  int lx_ = lx;
+  int ly_ = ly;
+  int rx_ = rx;
+
+  if (abs(lx_) < DEADZONE) lx_ = 0;
+  if (abs(ly_) < DEADZONE) ly_ = 0;
+  if (abs(rx_) < DEADZONE) rx_ = 0;
+
+  int vx = map(ly_, -127, 127, -MAXPWM, MAXPWM);
+  int vy = map(lx_, -127, 127, -MAXPWM, MAXPWM);
+  int w  = map(rx_, -127, 127, -MAXPWM, MAXPWM);
+
+  int m1 = vx - vy - w;
+  int m2 = vx + vy + w;
+  int m3 = vx + vy - w;
+  int m4 = vx - vy + w;
+
+  motor(knd1, knd2, m1);
+  motor(knb1, knb2, m2);
+  motor(krb1, krb2, m3);
+  motor(krd1, krd2, m4);
+}
+
+/* ===== I2C CALLBACK ===== */
+void receiveEvent(int howMany) {
+  if (howMany >= 3) {
+    lx = (int8_t)Wire.read();
+    ly = (int8_t)Wire.read();
+    rx = (int8_t)Wire.read();
+  }
+}
+
+/* ===== MOTOR ===== */
+void motor(int p1, int p2, int spd) {
+  spd = constrain(spd, -255, 255);
+
+  if (spd > 0) {
+    analogWrite(p1, spd);
+    analogWrite(p2, 0);
+  } 
+  else if (spd < 0) {
+    analogWrite(p1, 0);
+    analogWrite(p2, -spd);
+  } 
+  else {
+    analogWrite(p1, 0);
+    analogWrite(p2, 0);
+  }
+}
+
+void stopMotor() {
+  motor(knd1, knd2, 0);
+  motor(knb1, knb2, 0);
+  motor(krb1, krb2, 0);
+  motor(krd1, krd2, 0);
+}
