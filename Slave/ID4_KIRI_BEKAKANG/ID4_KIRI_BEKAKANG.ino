@@ -7,6 +7,9 @@
 #include "Driving.h"
 #include "Communication.h"
 
+// ==================== SERIAL2 UNTUK REALTIME DATA ====================
+HardwareSerial Serial2(PA3, PA2); // RX, TX untuk mengirim sudut steering & encoder count
+
 // ==================== AUTO RUN PLAN ====================
 struct Movement {
   float angle;
@@ -116,6 +119,7 @@ void autoRunTask(void *pvParameters) {
 
 void setup() {
   Serial.begin(115200);
+  Serial2.begin(115200);  // Inisialisasi Serial2 untuk realtime data
   delay(1000);
 
   steerCommandQueue = xQueueCreate(5, sizeof(SwerveCommand_t));

@@ -19,3 +19,10 @@ void MPU1() {
 void cal() {
   Serial5.println("CAL");
 }
+
+void fedback() {
+  while (Serial6.available()) {
+    String data = Serial6.readStringUntil('\n');
+    Serial.println(data);
+  }
+}

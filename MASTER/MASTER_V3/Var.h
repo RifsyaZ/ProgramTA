@@ -7,6 +7,23 @@ HardwareSerial Serial1(RS485_RX_PIN, RS485_TX_PIN);
 #define MPU_TX_PIN PC12
 HardwareSerial Serial5(MPU_RX_PIN, MPU_TX_PIN);
 
+// // Serial untuk feedback dari slave
+#define RX_ID1 PA3
+#define TX_ID1 PA2
+HardwareSerial Serial2(RX_ID1, TX_ID1);
+
+#define RX_ID2 PB11
+#define TX_ID2 PB10
+HardwareSerial Serial3(RX_ID2, TX_ID2);
+
+// #define RX_ID3 PA1
+// #define TX_ID3 PA0
+// HardwareSerial Serial4(RX_ID3, TX_ID3);
+
+#define RX_ID4 PC7
+#define TX_ID4 PC6
+HardwareSerial Serial6(RX_ID4, TX_ID4);
+
 
 //---------------------- Variabel MPU ----------------------//
 float yaw;
