@@ -1,3 +1,7 @@
+// ==================== VARIABEL GLOBAL UNTUK DATA SLAVE ID4 ====================
+float steer_angle_id4 = 0.0;
+long encoder_pulses_id4 = 0;
+
 // ==================== FUNGSI BACA DATA DARI MPU ====================
 void MPU1() {
   while (Serial5.available()) {
@@ -23,6 +27,17 @@ void cal() {
 void fedback() {
   while (Serial6.available()) {
     String data = Serial6.readStringUntil('\n');
-    Serial.println(data);
+    data.trim();
+    
+    if (data.startsWith("STEER:")) {
+      String valueStr = data.substring(6); // Ambil setelah "STEER:"
+      steer_angle_id4 = valueStr.toFloat();
+    } else if (data.startsWith("ENC:")) {
+      String valueStr = data.substring(4); // Ambil setelah "ENC:"
+      encoder_pulses_id4 = valueStr.toInt();
+    }
+    
+    Serial.print(steer_angle_id4); Serial.print(" ");Serial.println(encoder_pulses_id4);
+
   }
 }
