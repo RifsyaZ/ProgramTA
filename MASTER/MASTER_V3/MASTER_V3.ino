@@ -18,7 +18,9 @@ void setup() {
 
 // ==================== LOOP ====================
 void loop() {
+  MPU1();
   fedback();
+  Debug_odometry();
 }
 // if (Serial.available()) {
 //   String cmd = Serial.readStringUntil('\n');

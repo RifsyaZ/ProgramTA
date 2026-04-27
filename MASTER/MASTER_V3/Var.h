@@ -18,15 +18,17 @@ HardwareSerial Serial3(RX_ID2, TX_ID2);
 
 // #define RX_ID3 PA1
 // #define TX_ID3 PA0
-// HardwareSerial Serial4(RX_ID3, TX_ID3);
+// HardwareSerial Serial4(RX_ID3, TX_ID3); //Sudah terdefini di board
 
 #define RX_ID4 PC7
 #define TX_ID4 PC6
 HardwareSerial Serial6(RX_ID4, TX_ID4);
 
 
-//---------------------- Variabel MPU ----------------------//
+//---------------------- Variabel MPU && data Fedback Stering & Pulsa encoder ----------------------//
 float yaw;
+static float Fedback_Angle[4] = {0, 0, 0, 0};
+static float Fedback_Pulse[4] = {0, 0, 0, 0};
 
 // ======================= KONFIGURASI ROBOT =======================
 #define PI                3.14159265359f
