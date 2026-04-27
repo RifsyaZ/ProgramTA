@@ -89,8 +89,8 @@ void SwerveDrive(float Vx, float Vy, float Wz, float max_rpm) {
       target_angle[2], target_rpm[2]);  // ID4 RL
 }
 
-//--FOLLOW_RADIUS: body mengikuti arah radius && FOLLOW_DEFINE: heading robot tetap terjaga, hanya translasi--//
-void MOV_Radius(float Vx, float Vy, float max_rpm, float radius, char follow_mode) {
+// MOV_Radius: gerak melingkar dengan body mengikuti arah radius
+void MOV_Radius(float Vx, float Vy, float max_rpm, float radius) {
   float used_wz = 0.0f;
   if (radius != 0.0f) {
     float V = sqrtf(Vx * Vx + Vy * Vy);
@@ -99,9 +99,41 @@ void MOV_Radius(float Vx, float Vy, float max_rpm, float radius, char follow_mod
     }
   }
 
-  if (follow_mode == FOLLOW_RADIUS) {
-    SwerveDrive(Vx, Vy, used_wz, max_rpm);
-  } else {
+  SwerveDrive(Vx, Vy, used_wz, max_rpm);
+}
+
+// MOV_CurveFixedHeading: heading robot tetap, path mengikuti kurva dengan kecepatan yang berubah setiap loop.
+// Panggil fungsi ini berulang di loop utama agar robot mempertahankan radius yang diinginkan.
+// Contoh: MOV_CurveFixedHeading(0.3f, 0.0f, 100.0f, 1.0f);
+void MOV_CurveFixedHeading(float Vx, float Vy, float max_rpm, float radius) {
+  float V = sqrtf(Vx * Vx + Vy * Vy);
+  if (V <= 0.0f || radius == 0.0f) {
     SwerveDrive(Vx, Vy, 0.0f, max_rpm);
+    return;
   }
+
+  static float curve_phase = 0.0f;
+  static unsigned long last_curve_time = 0;
+  static float last_radius = 0.0f;
+  static float last_speed = 0.0f;
+
+  unsigned long now = millis();
+  if (last_curve_time == 0 || last_radius != radius || fabsf(last_speed - V) > 0.001f) {
+    curve_phase = atan2f(Vy, Vx);
+    last_curve_time = now;
+    last_radius = radius;
+    last_speed = V;
+  }
+
+  float dt = (now - last_curve_time) * 0.001f;
+  if (dt > 0.0f) {
+    float direction = (radius > 0.0f) ? 1.0f : -1.0f;
+    curve_phase += direction * (V / fabsf(radius)) * dt;
+    last_curve_time = now;
+  }
+
+  float used_vx = V * cosf(curve_phase);
+  float used_vy = V * sinf(curve_phase);
+
+  SwerveDrive(used_vx, used_vy, 0.0f, max_rpm);
 }
