@@ -13,7 +13,22 @@ void setup() {
   Serial5.begin(115200);  // komunikasi MCU MPU
   Serial6.begin(115200);  // komunikasi KE ID 4
 
-  delay(3000);
+  pinMode(BUZZER_PIN, OUTPUT);
+  ModeBuzzer(TULULIT);
+  ModeBuzzer(TET_TET);
+  while (1) {
+    MPU1();
+    if (yaw != 0) {
+      MPU1();
+      ModeBuzzer(MPU_Ready);
+      break;
+    } else {
+      MPU1();
+      Serial.println("MPU Belum Ready!!!");
+      ModeBuzzer(MPU_BelumReady);
+    }
+  }
+  ModeBuzzer(Armed);
 }
 
 // ==================== LOOP ====================
@@ -21,21 +36,18 @@ void loop() {
   MPU1();
   fedback();
   Debug_odometry();
-}
-// if (Serial.available()) {
-//   String cmd = Serial.readStringUntil('\n');
-//   cmd.trim();
-//   if (cmd.length() == 0) return;
+  if (Serial.available()) {
+    String cmd = Serial.readStringUntil('\n');
+    cmd.trim();
+    if (cmd.length() == 0) return;
 
-//   cmd.toUpperCase();
-//   if (cmd == "G") {
-//     // TEST(0);
-//     while (1) {
-//       MOV_Radius(0.3, 0, 0, 0.3);
-//     }
-//   } else if (cmd == "S") {
-//     STOP_ALL();
-//   } else if (cmd == "H") {
-//     HOME_ALL();
-//   }
-// }
+    cmd.toUpperCase();
+    if (cmd == "G") {
+      TEST(0);
+    } else if (cmd == "S") {
+      STOP_ALL();
+    } else if (cmd == "H") {
+      HOME_ALL();
+    }
+  }
+}

@@ -202,6 +202,10 @@ void drivingTask(void *pvParameters) {
       analogWrite(DRIVE_RPWM, 0);
       analogWrite(DRIVE_LPWM, 0);
     }
+    
+    // Kirim encoder count driving realtime ke Serial2
+    Serial2.print("ENC:");
+    Serial2.println(driveEncoderCount);
   }
 }
 

@@ -9,12 +9,22 @@ void MOV(float A1, float R1, float A2, float R2, float A3, float R3, float A4, f
   cmd += String(A4, 1) + "," + String(R4, 1);
 
   Serial1.println(cmd);
-  // Serial.print("MOV: ");
-  // Serial.println(cmd);
-  Serial.print("A1="); Serial.print(A1, 1); Serial.print(" R1="); Serial.println(R1, 1);
-  Serial.print(" A2="); Serial.print(A2, 1); Serial.print(" R2="); Serial.println(R2, 1);
-  Serial.print(" A3="); Serial.print(A3, 1); Serial.print(" R3="); Serial.println(R3, 1);
-  Serial.print(" A4="); Serial.print(A4, 1); Serial.print(" R4="); Serial.println(R4, 1);
+  Serial.print("A1=");
+  Serial.print(A1, 1);
+  Serial.print(" R1=");
+  Serial.println(R1, 1);
+  Serial.print(" A2=");
+  Serial.print(A2, 1);
+  Serial.print(" R2=");
+  Serial.println(R2, 1);
+  Serial.print(" A3=");
+  Serial.print(A3, 1);
+  Serial.print(" R3=");
+  Serial.println(R3, 1);
+  Serial.print(" A4=");
+  Serial.print(A4, 1);
+  Serial.print(" R4=");
+  Serial.println(R4, 1);
 }
 
 //---------------------- SET KE SUDUT 0 DAN RPM RODA 0 ----------------------//
@@ -27,6 +37,9 @@ void STOP_ALL() {
 void HOME_ALL() {
   for (int i = 1; i <= 4; i++) {
     Serial1.print(i);
+    delay(10);
+    Serial1.print(i);
+    delay(10);
     Serial1.println(":HOME");
     delay(5);
   }

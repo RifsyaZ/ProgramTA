@@ -26,11 +26,11 @@ void fedback() {
     data.trim();
 
     if (data.startsWith("STEER:")) {
-      String valueStr = data.substring(6);  // Ambil setelah "STEER:"
-      Fedback_Angle[0] = valueStr.toFloat();
+      String valueStrID1 = data.substring(6);  // Ambil setelah "STEER:"
+      Fedback_Angle[0] = valueStrID1.toFloat();
     } else if (data.startsWith("ENC:")) {
-      String valueStr = data.substring(4);  // Ambil setelah "ENC:"
-      Fedback_Pulse[0] = valueStr.toInt();
+      String valueStrID1 = data.substring(4);  // Ambil setelah "ENC:"
+      Fedback_Pulse[0] = valueStrID1.toInt();
     }
   }
   //---------------------- ID 2----------------------//
@@ -39,11 +39,11 @@ void fedback() {
     data.trim();
 
     if (data.startsWith("STEER:")) {
-      String valueStr = data.substring(6);  // Ambil setelah "STEER:"
-      Fedback_Angle[1] = valueStr.toFloat();
+      String valueStrID2 = data.substring(6);  // Ambil setelah "STEER:"
+      Fedback_Angle[1] = valueStrID2.toFloat();
     } else if (data.startsWith("ENC:")) {
-      String valueStr = data.substring(4);  // Ambil setelah "ENC:"
-      Fedback_Pulse[1] = valueStr.toInt();
+      String valueStrID2 = data.substring(4);  // Ambil setelah "ENC:"
+      Fedback_Pulse[1] = valueStrID2.toInt();
     }
   }
   //---------------------- ID 3----------------------//
@@ -52,11 +52,11 @@ void fedback() {
     data.trim();
 
     if (data.startsWith("STEER:")) {
-      String valueStr = data.substring(6);  // Ambil setelah "STEER:"
-      Fedback_Angle[2] = valueStr.toFloat();
+      String valueStrID3 = data.substring(6);  // Ambil setelah "STEER:"
+      Fedback_Angle[2] = valueStrID3.toFloat();
     } else if (data.startsWith("ENC:")) {
-      String valueStr = data.substring(4);  // Ambil setelah "ENC:"
-      Fedback_Pulse[2] = valueStr.toInt();
+      String valueStrID3 = data.substring(4);  // Ambil setelah "ENC:"
+      Fedback_Pulse[2] = valueStrID3.toInt();
     }
   }
   //---------------------- ID 4----------------------//
@@ -65,11 +65,11 @@ void fedback() {
     data.trim();
 
     if (data.startsWith("STEER:")) {
-      String valueStr = data.substring(6);  // Ambil setelah "STEER:"
-      Fedback_Angle[3] = valueStr.toFloat();
+      String valueStrID4 = data.substring(6);  // Ambil setelah "STEER:"
+      Fedback_Angle[3] = valueStrID4.toFloat();
     } else if (data.startsWith("ENC:")) {
-      String valueStr = data.substring(4);  // Ambil setelah "ENC:"
-      Fedback_Pulse[3] = valueStr.toInt();
+      String valueStrID4 = data.substring(4);  // Ambil setelah "ENC:"
+      Fedback_Pulse[3] = valueStrID4.toInt();
     }
   }
 }

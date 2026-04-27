@@ -280,6 +280,10 @@ void steeringTask(void *pvParameters) {
       steer_setMotor(0);
       steer_currentOutput = 0;
     }
+    
+    // Kirim sudut steering realtime ke Serial2 (selalu, tidak hanya saat steering_active)
+    Serial2.print("STEER:");
+    Serial2.println(steerAngleDeg, 1);
   }
 }
 

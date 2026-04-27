@@ -7,9 +7,6 @@
 #include "Driving.h"
 #include "Communication.h"
 
-// ==================== SERIAL2 UNTUK REALTIME DATA ====================
-HardwareSerial Serial2(PA3, PA2); // RX, TX untuk mengirim sudut steering & encoder count
-
 // ==================== AUTO RUN PLAN ====================
 struct Movement {
   float angle;

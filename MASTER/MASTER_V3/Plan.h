@@ -2,11 +2,17 @@ void TEST(int Index) {
   unsigned long int Time;
   Time = 0;
   Time = millis();
+  MPU1();
+  fedback();
+  Debug_odometry();
   switch (Index) {
     case 0:
       Time = 0;
       Time = millis();
       while (1) {
+        MPU1();
+        fedback();
+        Debug_odometry();
         SwerveDrive(0.3, 0, 0, 0);
         MPU1();
         Serial.println("Di Case 0");
@@ -18,7 +24,13 @@ void TEST(int Index) {
     case 1:
       Time = 0;
       Time = millis();
+      MPU1();
+      fedback();
+      Debug_odometry();
       while (1) {
+        MPU1();
+        fedback();
+        Debug_odometry();
         SwerveDrive(0, 0.3, 0, 0);
         MPU1();
         Serial.println("Di Case 1");
@@ -30,7 +42,13 @@ void TEST(int Index) {
     case 2:
       Time = 0;
       Time = millis();
+      MPU1();
+      fedback();
+      Debug_odometry();
       while (1) {
+        MPU1();
+        fedback();
+        Debug_odometry();
         SwerveDrive(0, 0, 0.3, 0);
         MPU1();
         Serial.println("Di Case 2");

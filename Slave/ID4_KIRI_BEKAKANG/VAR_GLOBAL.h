@@ -40,6 +40,9 @@
 #define DRIVE_PWM_MAX 255
 #define drive_filterAlpha 0.2
 
+// ==================== SERIAL2 UNTUK REALTIME DATA ====================
+HardwareSerial Serial2(PA3, PA2); // RX, TX untuk mengirim sudut steering & encoder count
+
 // ==================== GLOBAL VARIABLES (extern) ====================
 // Steering variables
 extern volatile int32_t steerEncoderCount;
