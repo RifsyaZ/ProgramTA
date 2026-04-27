@@ -29,14 +29,21 @@ void HOME_ALL() {
   Serial.println("HOME ALL");
 }
 
+// Vx = kecepatan translasi robot terhadap sumbu x maju/mundur (m/s)
+// Vy = kecepatan translasi robot terhadap sumbu y kiri/kanan (m/s)
+// Wz = kecepatan sudut rotasi robot terhadap sumbu Z (rad/s), sama dengan omega
 void SwerveDrive(float Vx, float Vy, float Wz, float max_rpm) {
   float target_angle[4];
   float target_rpm[4];
 
   for (int i = 0; i < 4; i++) {
-    float vx_i = Vx - (Wz * module_y[i]);  // ROS: vx_i = Vx - Wz * li_y
-    float vy_i = Vy + (Wz * module_x[i]);  // ROS: vy_i = Vy + Wz * li_x
+    float x = module_x[i];
+    float y = module_y[i];
 
+    float vx_i = Vx - (Wz * y);  // ROS: vx_i = Vx - Wz * li_y
+    float vy_i = Vy + (Wz * x);  // ROS: vy_i = Vy + Wz * li_x
+
+    // Kecepatan total pada modul (resultant) untuk konversi ke putaran roda
     float speed_ms = sqrtf(vx_i * vx_i + vy_i * vy_i);  // ROS: vi = sqrt(vx_i^2 + vy_i^2)
     float rps = speed_ms / (2.0f * PI * R_WHEEL);
     float rpm = rps * 60.0f;
@@ -80,4 +87,21 @@ void SwerveDrive(float Vx, float Vy, float Wz, float max_rpm) {
       target_angle[1], target_rpm[1],   // ID2 FR
       target_angle[3], target_rpm[3],   // ID3 RR
       target_angle[2], target_rpm[2]);  // ID4 RL
+}
+
+//--FOLLOW_RADIUS: body mengikuti arah radius && FOLLOW_DEFINE: heading robot tetap terjaga, hanya translasi--//
+void MOV_Radius(float Vx, float Vy, float max_rpm, float radius, char follow_mode) {
+  float used_wz = 0.0f;
+  if (radius != 0.0f) {
+    float V = sqrtf(Vx * Vx + Vy * Vy);
+    if (V > 0.0f) {
+      used_wz = (radius > 0.0f ? 1.0f : -1.0f) * (V / fabsf(radius));
+    }
+  }
+
+  if (follow_mode == FOLLOW_RADIUS) {
+    SwerveDrive(Vx, Vy, used_wz, max_rpm);
+  } else {
+    SwerveDrive(Vx, Vy, 0.0f, max_rpm);
+  }
 }

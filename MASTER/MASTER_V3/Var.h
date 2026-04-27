@@ -15,6 +15,9 @@ float yaw;
 #define PI                3.14159265359f
 #define R_WHEEL           0.0225f    // Jari-jari roda (45mm / 2)
 
+#define FOLLOW_RADIUS     'R'        // body mengikuti arah radius
+#define FOLLOW_DEFINE     'D'        // heading robot tetap terjaga, hanya translasi
+
 // Koordinat modul (meter) - 259.5 / 2
 #define L_X               0.12975f
 #define L_Y               0.12975f
