@@ -22,12 +22,14 @@ void loop() {
 
     cmd.toUpperCase();
     if (cmd == "G") {
-      TEST(0);
+      // TEST(0);
+      while (1) {
+        MOV_Radius(0.3, 0, 0, 0.3);
+      }
     } else if (cmd == "S") {
       STOP_ALL();
     } else if (cmd == "H") {
       HOME_ALL();
     }
   }
-  Serial.println("TES");
 }

@@ -126,69 +126,165 @@ void parseRs485Command(String cmd) {
     return;
   }
   
-  int slaveId = cmd.substring(0, firstColon).toInt();
+  String idStr = cmd.substring(0, firstColon);
   
-  // Cek apakah ID sesuai dengan slave ini
-  if (slaveId != RS485_SLAVE_ID) {
-    return;  // Bukan untuk slave ini, abaikan
+  // ===== FORMAT ALL: BROADCAST DENGAN NILAI BERBEDA =====
+  if (idStr == "ALL" || idStr == "all") {
+    // Format: ALL:angle1,rpm1:angle2,rpm2:angle3,rpm3:angle4,rpm4
+    // Slave akan ambil sesuai ID-nya
+    
+    String data = cmd.substring(firstColon + 1);
+    
+    // Split berdasarkan ":"
+    int pos = 0;
+    int wheelData[4][2];  // [index][0]=angle, [index][1]=rpm (pakai int sementara)
+    int wheelIndex = 0;
+    
+    while (pos < data.length() && wheelIndex < 4) {
+      int nextColon = data.indexOf(':', pos);
+      String wheelStr;
+      
+      if (nextColon == -1) {
+        wheelStr = data.substring(pos);
+      } else {
+        wheelStr = data.substring(pos, nextColon);
+      }
+      
+      // Parse angle,rpm
+      int comma = wheelStr.indexOf(',');
+      if (comma > 0) {
+        float angle = wheelStr.substring(0, comma).toFloat();
+        float rpm = wheelStr.substring(comma + 1).toFloat();
+        
+        // Cek apakah ini untuk slave ini
+        if ((wheelIndex + 1) == RS485_SLAVE_ID) {
+          executeSwerveCommand(angle, rpm);
+          
+          if (serialMutex != NULL) {
+            xSemaphoreTake(serialMutex, portMAX_DELAY);
+            Serial.print("📡 ALL [Roda ");
+            Serial.print(RS485_SLAVE_ID);
+            Serial.print("]: A");
+            Serial.print(angle);
+            Serial.print(" R");
+            Serial.println(rpm);
+            xSemaphoreGive(serialMutex);
+          }
+        }
+      }
+      
+      wheelIndex++;
+      if (nextColon == -1) break;
+      pos = nextColon + 1;
+    }
+    
+    return;
   }
   
+  // ===== FORMAT HOME/HOMING =====
   String afterId = cmd.substring(firstColon + 1);
   afterId.toUpperCase();
   
-  // ===== CEK PERINTAH HOME/HOMING =====
+  int slaveId = idStr.toInt();
+  if (slaveId != RS485_SLAVE_ID) return;
+  
   if (afterId == "HOME" || afterId == "HOMING") {
-    if (serialMutex != NULL) {
-      xSemaphoreTake(serialMutex, portMAX_DELAY);
-      Serial.print("📡 RS485 [ID:");
-      Serial.print(slaveId);
-      Serial.println("] PERINTAH HOMING");
-      xSemaphoreGive(serialMutex);
-    }
-    
-    // Panggil fungsi homing
     homing_handleCommand("HOME");
-    
-    // Kirim ACK
     sendRs485Response("OK:" + String(RS485_SLAVE_ID) + ":HOME");
     return;
   }
   
-  // ===== CEK PERINTAH STOP =====
+  // ===== FORMAT STOP =====
   if (afterId == "STOP") {
     SwerveCommand_t stopCmd;
     stopCmd.stop_all = true;
     xQueueSend(steerCommandQueue, &stopCmd, 0);
     xQueueSend(driveCommandQueue, &stopCmd, 0);
-    
     sendRs485Response("OK:" + String(RS485_SLAVE_ID) + ":STOP");
     return;
   }
   
-  // ===== CEK PERINTAH GERAK (ID:ANGLE:RPM) =====
+  // ===== FORMAT ID:ANGLE:RPM =====
   int secondColon = cmd.indexOf(':', firstColon + 1);
-  
   if (secondColon > firstColon) {
     float angle = cmd.substring(firstColon + 1, secondColon).toFloat();
     float rpm = cmd.substring(secondColon + 1).toFloat();
     
     executeSwerveCommand(angle, rpm);
     sendRs485Response("OK:" + String(RS485_SLAVE_ID) + ":A" + String(angle) + ":R" + String(rpm));
-    
-    if (serialMutex != NULL) {
-      xSemaphoreTake(serialMutex, portMAX_DELAY);
-      Serial.print("📡 RS485 [ID:");
-      Serial.print(slaveId);
-      Serial.print("] A");
-      Serial.print(angle);
-      Serial.print(" R");
-      Serial.println(rpm);
-      xSemaphoreGive(serialMutex);
-    }
-  } else {
-    sendRs485Response("ERROR:INVALID_FORMAT");
   }
 }
+// void parseRs485Command(String cmd) {
+//   int firstColon = cmd.indexOf(':');
+  
+//   if (firstColon <= 0) {
+//     sendRs485Response("ERROR:INVALID_FORMAT");
+//     return;
+//   }
+  
+//   int slaveId = cmd.substring(0, firstColon).toInt();
+  
+//   // Cek apakah ID sesuai dengan slave ini
+//   if (slaveId != RS485_SLAVE_ID) {
+//     return;  // Bukan untuk slave ini, abaikan
+//   }
+  
+//   String afterId = cmd.substring(firstColon + 1);
+//   afterId.toUpperCase();
+  
+//   // ===== CEK PERINTAH HOME/HOMING =====
+//   if (afterId == "HOME" || afterId == "HOMING") {
+//     if (serialMutex != NULL) {
+//       xSemaphoreTake(serialMutex, portMAX_DELAY);
+//       Serial.print("📡 RS485 [ID:");
+//       Serial.print(slaveId);
+//       Serial.println("] PERINTAH HOMING");
+//       xSemaphoreGive(serialMutex);
+//     }
+    
+//     // Panggil fungsi homing
+//     homing_handleCommand("HOME");
+    
+//     // Kirim ACK
+//     sendRs485Response("OK:" + String(RS485_SLAVE_ID) + ":HOME");
+//     return;
+//   }
+  
+//   // ===== CEK PERINTAH STOP =====
+//   if (afterId == "STOP") {
+//     SwerveCommand_t stopCmd;
+//     stopCmd.stop_all = true;
+//     xQueueSend(steerCommandQueue, &stopCmd, 0);
+//     xQueueSend(driveCommandQueue, &stopCmd, 0);
+    
+//     sendRs485Response("OK:" + String(RS485_SLAVE_ID) + ":STOP");
+//     return;
+//   }
+  
+//   // ===== CEK PERINTAH GERAK (ID:ANGLE:RPM) =====
+//   int secondColon = cmd.indexOf(':', firstColon + 1);
+  
+//   if (secondColon > firstColon) {
+//     float angle = cmd.substring(firstColon + 1, secondColon).toFloat();
+//     float rpm = cmd.substring(secondColon + 1).toFloat();
+    
+//     executeSwerveCommand(angle, rpm);
+//     sendRs485Response("OK:" + String(RS485_SLAVE_ID) + ":A" + String(angle) + ":R" + String(rpm));
+    
+//     if (serialMutex != NULL) {
+//       xSemaphoreTake(serialMutex, portMAX_DELAY);
+//       Serial.print("📡 RS485 [ID:");
+//       Serial.print(slaveId);
+//       Serial.print("] A");
+//       Serial.print(angle);
+//       Serial.print(" R");
+//       Serial.println(rpm);
+//       xSemaphoreGive(serialMutex);
+//     }
+//   } else {
+//     sendRs485Response("ERROR:INVALID_FORMAT");
+//   }
+// }
 
 void sendRs485RealtimeData() {
   int ready = steer_targetReached ? 1 : 0;

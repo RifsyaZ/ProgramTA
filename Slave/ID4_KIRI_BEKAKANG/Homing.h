@@ -17,7 +17,7 @@
 #define HOMING_PWM_MIN 15
 #define HOMING_RPM 20
 #define HOMING_SENSOR_HIGH 1000
-#define HOMING_SENSOR_LOW 370
+#define HOMING_SENSOR_LOW 450
 
 // ==================== ARAH KONSTANTA ====================
 #define ARAH_HOME     1   // Kiri HIGH, Kanan LOW -> SUDAH HOME
