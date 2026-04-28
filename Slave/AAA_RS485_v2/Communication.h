@@ -17,6 +17,8 @@ void printSystemStatus();
 void executeSwerveCommand(float angle, float rpm);
 void sendRs485Response(String response);
 void sendGuiData();
+void sendRs485RealtimeData();
+void rs485RealtimeTask(void *pvParameters);
 
 // ==================== COMMUNICATION IMPLEMENTATIONS ====================
 #pragma region Communication_Implementations
@@ -168,6 +170,33 @@ void guiOutputTask(void *pvParameters) {
   while(1) {
     vTaskDelayUntil(&xLastWakeTime, xFrequency);
     sendGuiData();
+  }
+}
+
+void sendRs485RealtimeData() {
+  int ready = steer_targetReached ? 1 : 0;
+  int pwm_pos = (int)steer_currentOutput;
+  int pwm_spd = drive_pwmOutput;
+  
+  String output = String(RS485_SLAVE_ID) + ":" + 
+                  String(steerAngleDeg, 1) + "," +
+                  String(drive_wheelRpm, 1) + "," +
+                  String(pwm_pos) + "," +
+                  String(pwm_spd) + "," +
+                  String(ready);
+  
+  Serial1.println(output);
+}
+
+void rs485RealtimeTask(void *pvParameters) {
+  TickType_t xLastWakeTime = xTaskGetTickCount();
+  const TickType_t xFrequency = pdMS_TO_TICKS(50);
+  
+  vTaskDelay(pdMS_TO_TICKS(500));
+  
+  while(1) {
+    vTaskDelayUntil(&xLastWakeTime, xFrequency);
+    sendRs485RealtimeData();
   }
 }
 

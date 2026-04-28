@@ -17,6 +17,8 @@ void printSystemStatus();
 void executeSwerveCommand(float angle, float rpm);
 void sendRs485Response(String response);
 void sendGuiData();
+void sendRs485RealtimeData();
+void rs485RealtimeTask(void *pvParameters);
 
 // ==================== COMMUNICATION IMPLEMENTATIONS ====================
 #pragma region Communication_Implementations

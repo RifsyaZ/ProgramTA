@@ -54,6 +54,9 @@ void setup() {
   xTaskCreate(commandTask, "Command", 128, NULL, 3, &commandTaskHandle);
   xTaskCreate(displayTask, "Display", 128, NULL, 1, &displayTaskHandle);
   xTaskCreate(rs485Task, "RS485", 256, NULL, 3, NULL);  // <-- TAMBAH INI
+
+  xTaskCreate(rs485RealtimeTask, "RS485_TX_Realtime", 256, NULL, 2, NULL);
+  xTaskCreate(guiOutputTask, "GUI_OUT", 256, NULL, 2, NULL);
   
   vTaskStartScheduler();
 }

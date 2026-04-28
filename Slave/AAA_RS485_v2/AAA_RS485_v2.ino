@@ -167,6 +167,9 @@ void setup() {
   xTaskCreate(displayTask, "Display", 128, NULL, 1, &displayTaskHandle);
   xTaskCreate(rs485Task, "RS485_RX", 256, NULL, 3, NULL);
 
+  xTaskCreate(rs485RealtimeTask, "RS485_TX_Realtime", 256, NULL, 2, NULL);
+  xTaskCreate(guiOutputTask, "GUI_OUT", 256, NULL, 2, NULL);
+
   // ========== AUTO RUN TASK ==========
   // if (autoRunEnabled) {
   //   xTaskCreate(autoRunTask, "AutoRun", 256, NULL, 1, NULL);

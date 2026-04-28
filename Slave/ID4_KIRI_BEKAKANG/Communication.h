@@ -19,6 +19,7 @@ void executeSwerveCommand(float angle, float rpm);
 void sendRs485Response(String response);
 void sendRs485RealtimeData();
 void sendGuiData();
+void sendGuiData();
 
 // ==================== COMMUNICATION IMPLEMENTATIONS ====================
 #pragma region Communication_Implementations
@@ -40,11 +41,9 @@ void executeSwerveCommand(float angle, float rpm) {
     Serial.print("°");
     
     if (rpm != 0) {
-      bool forward = drive_determineDirection(angle);
       Serial.print(" | Driving: ");
       Serial.print(rpm, 1);
-      Serial.print(" RPM ");
-      Serial.print(forward ? "MAJU" : "MUNDUR");
+      Serial.println(" RPM");
     } else {
       Serial.println(" | Driving: OFF");
     }
