@@ -2,12 +2,19 @@
 #include <BLEServer.h>
 #include <BLEUtils.h>
 #include <BLE2902.h>
+#include <Wire.h>
+
+#define I2C_SLAVE_ADDR 0x08
+#define SERVICE_UUID "12345678-1234-1234-1234-123456789abc"
+#define CHARACTERISTIC_UUID "abcd1234-5678-1234-5678-abcdef123456"
+
+volatile char ble_command = '0';
+volatile float i2c_yaw = 0;
+volatile float i2c_angles[4] = {0, 0, 0, 0};
+volatile int i2c_pulses[4] = {0, 0, 0, 0};
 
 BLECharacteristic *pCharacteristic;
 bool deviceConnected = false;
-
-#define SERVICE_UUID "12345678-1234-1234-1234-123456789abc"
-#define CHARACTERISTIC_UUID "abcd1234-5678-1234-5678-abcdef123456"
 
 // ================= CALLBACK CONNECT =================
 class MyServerCallbacks : public BLEServerCallbacks {
@@ -28,31 +35,94 @@ class MyCallbacks: public BLECharacteristicCallbacks {
     std::string value = pCharacteristic->getValue();
 
     if (value.length() > 0) {
-      Serial.print("Command: ");
-      Serial.println(value.c_str());
+      char cmd = value[0];  // Ambil karakter pertama
+      Serial.print("[BLE RX] Command: ");
+      Serial.println(cmd);
+      
+      // Set command untuk dikirim ke Master via I2C
+      ble_command = cmd;
 
-      if (value == "F") {
+      if (cmd == 'F') {
         Serial.println("MAJU");
       }
-      else if (value == "B") {
+      else if (cmd == 'B') {
         Serial.println("MUNDUR");
       }
-      else if (value == "L") {
+      else if (cmd == 'L') {
         Serial.println("KIRI");
       }
-      else if (value == "R") {
+      else if (cmd == 'R') {
         Serial.println("KANAN");
       }
-      else if (value == "S") {
+      else if (cmd == 'S') {
         Serial.println("STOP");
       }
     }
   }
 };
 
+// ===== I2C SLAVE HANDLERS =====
+void onI2CRequest() {
+  Wire.write(ble_command);  // Kirim command ke Master
+  ble_command = '0';         // Clear
+}
+
+void onI2CReceive(int len) {
+  if (len == 0) return;
+  byte data_type = Wire.read();
+  len--;
+  
+  if (data_type == 0x02) {  // Odometry data
+    // Baca yaw
+    byte yaw_bytes[4];
+    for(int i = 0; i < 4 && Wire.available(); i++) {
+      yaw_bytes[i] = Wire.read();
+    }
+    memcpy((void*)&i2c_yaw, yaw_bytes, 4);
+    
+    // Baca angles
+    for(int j = 0; j < 4; j++) {
+      byte angle_bytes[4];
+      for(int i = 0; i < 4 && Wire.available(); i++) {
+        angle_bytes[i] = Wire.read();
+      }
+      memcpy((void*)&i2c_angles[j], angle_bytes, 4);
+    }
+    
+    // Baca pulses
+    for(int j = 0; j < 4; j++) {
+      byte pulse_bytes[2];
+      for(int i = 0; i < 2 && Wire.available(); i++) {
+        pulse_bytes[i] = Wire.read();
+      }
+      memcpy((void*)&i2c_pulses[j], pulse_bytes, 2);
+    }
+    
+    Serial.print("[I2C RX] Odometry - YAW: ");
+    Serial.print(i2c_yaw);
+    Serial.print(" Angles: ");
+    for(int i = 0; i < 4; i++) {
+      Serial.print(i2c_angles[i]);
+      Serial.print(" ");
+    }
+    Serial.println();
+  }
+  
+  while(Wire.available()) Wire.read();
+}
+
 void setup() {
   Serial.begin(115200);
+  delay(100);
+  
+  // ===== INISIALISASI I2C SLAVE =====
+  Wire.begin(I2C_SLAVE_ADDR, 10, 8);  // SDA=GPIO10, SCL=GPIO8
+  Wire.onRequest(onI2CRequest);
+  Wire.onReceive(onI2CReceive);
+  Serial.println("[I2C] Slave initialized on 0x08");
+  delay(100);
 
+  // ===== INISIALISASI BLE =====
   BLEDevice::init("ESP32-C3-BLE");
 
   BLEServer *pServer = BLEDevice::createServer();
@@ -72,7 +142,7 @@ void setup() {
   BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
   pAdvertising->start();
 
-  Serial.println("Waiting for client...");
+  Serial.println("[BLE] Waiting for client...");
 }
 
 void loop() {
