@@ -10,6 +10,7 @@ void parseCommand(String cmd) {
   H = false;
   STOP = false;
 
+  cmd.trim();
   if (cmd == "S") {
     STOP = true;
     return;
@@ -26,8 +27,8 @@ void parseCommand(String cmd) {
     else if (part == "R") D = true;
     else if (part == "J") J = true;
     else if (part == "K") K = true;
-    else if (part == "P") J = true;
-    else if (part == "H") K = true;
+    else if (part == "P") P = true;
+    else if (part == "H") H = true;
     start = end + 1;
     end = cmd.indexOf(',', start);
   }

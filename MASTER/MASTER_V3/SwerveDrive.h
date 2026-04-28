@@ -50,6 +50,7 @@ void HOME_ALL() {
 // Vy = kecepatan translasi robot terhadap sumbu y kiri/kanan (m/s)
 // Wz = kecepatan sudut rotasi robot terhadap sumbu Z (rad/s), sama dengan omega
 void SwerveDrive(float Vx, float Vy, float Wz, float max_rpm) {
+  fedback();
   float target_angle[4];
   float target_rpm[4];
 
@@ -65,19 +66,7 @@ void SwerveDrive(float Vx, float Vy, float Wz, float max_rpm) {
     float rps = speed_ms / (2.0f * PI * R_WHEEL);
     float rpm = rps * 60.0f;
 
-    float raw_angle = atan2f(vy_i, vx_i);  // ROS: phii = atan2(vy_i, vx_i)
-
-    float prev_ros = 360.0f - prev_angle[i];  // ROS: prev_ros = prev_angle[i]
-    if (prev_ros >= 360.0f) prev_ros -= 360.0f;
-
-    float delta = raw_angle - (prev_ros * PI / 180.0f);
-    while (delta > PI) delta -= 2 * PI;
-    while (delta < -PI) delta += 2 * PI;
-
-    if (fabsf(delta) > PI / 2.0f) {
-      raw_angle += PI;
-    }
-
+    float raw_angle = atan2f(vy_i, vx_i);                  // ROS: phii = atan2(vy_i, vx_i)
     float angle_deg = 360.0f - (raw_angle * 180.0f / PI);  // ROS: angle_deg = raw_angle * 180/PI
     while (angle_deg < 0) angle_deg += 360.0f;
     while (angle_deg >= 360) angle_deg -= 360.0f;
@@ -87,16 +76,23 @@ void SwerveDrive(float Vx, float Vy, float Wz, float max_rpm) {
     prev_angle[i] = angle_deg;
   }
 
-  float max_abs_rpm = 0;
-  for (int i = 0; i < 4; i++) {
-    if (target_rpm[i] > max_abs_rpm) {  // ROS: fabsf(target_rpm[i])
-      max_abs_rpm = target_rpm[i];
-    }
-  }
-  if (max_abs_rpm > max_rpm) {
-    float scale = max_rpm / max_abs_rpm;
+  if (max_rpm == 0) {
+    // Testing steering angles only: kirim sudut, tetapi rpm drive = 0
     for (int i = 0; i < 4; i++) {
-      target_rpm[i] *= scale;
+      target_rpm[i] = 0;
+    }
+  } else {
+    float max_abs_rpm = 0;
+    for (int i = 0; i < 4; i++) {
+      if (target_rpm[i] > max_abs_rpm) {  // ROS: fabsf(target_rpm[i])
+        max_abs_rpm = target_rpm[i];
+      }
+    }
+    if (max_abs_rpm > max_rpm) {
+      float scale = max_rpm / max_abs_rpm;
+      for (int i = 0; i < 4; i++) {
+        target_rpm[i] *= scale;
+      }
     }
   }
 

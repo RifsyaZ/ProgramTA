@@ -57,12 +57,20 @@ void loop() {
     SwerveDrive(0.3, 0, 0, 0);
   } else if (S) {
     Serial.println("Mundur");
-    SwerveDrive(-0.3, 0, 0, 0);
+    // SwerveDrive(-0.3, 0, 0, 0);
+    while (1) {
+      fedback();
+      SwerveDrive(0.3, 0, 0, 30);
+      if (Fedback_Pulse[1] == 346) {
+        STOP_ALL();
+        break;
+      }
+    }
   } else if (A) {
     Serial.println("kiri");
     SwerveDrive(0, 0.3, 0, 0);
   } else if (D) {
-    Serial.println("Mundur");
+    Serial.println("kanan");
     SwerveDrive(0, -0.3, 0, 0);
   } else if (J) {
     SwerveDrive(0, 0, 0.3, 0);
