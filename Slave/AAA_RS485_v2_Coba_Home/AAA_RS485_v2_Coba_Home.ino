@@ -159,7 +159,6 @@ void setup() {
   xTaskCreate(commandTask, "Command", 128, NULL, 3, &commandTaskHandle);
   xTaskCreate(displayTask, "Display", 128, NULL, 1, &displayTaskHandle);
   xTaskCreate(rs485Task, "RS485_RX", 256, NULL, 3, NULL);
-  xTaskCreate(guiOutputTask, "GUI_OUT", 256, NULL, 2, NULL);
   
   // ========== HOMING TASK ==========
   xTaskCreate(homingTask, "Homing", 256, NULL, 2, &homingTaskHandle);
