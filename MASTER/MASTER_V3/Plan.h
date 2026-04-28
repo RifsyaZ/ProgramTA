@@ -13,7 +13,7 @@ void TEST(int Index) {
         MPU1();
         fedback();
         Debug_odometry();
-        SwerveDrive(0.3, 0, 0, 0);
+        SwerveDrive(0.3, 0, 0, 30);
         MPU1();
         Serial.println("Di Case 0");
         if (millis() - Time >= 3000) {

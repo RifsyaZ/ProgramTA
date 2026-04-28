@@ -39,68 +39,67 @@ void loop() {
   MPU1();
   fedback();
   Debug_odometry();
-  CommunicationESP();
-  if (W && D) {
-    Serial.println("MAJU KANAN");
-    SwerveDrive(0.3, -0.3, 0, 0);
-  } else if (W && A) {
-    Serial.println("MAJU Kiri");
-    SwerveDrive(0.3, 0.3, 0, 0);
-  } else if (S && D) {
-    Serial.println("Mundur KANAN");
-    SwerveDrive(-0.3, -0.3, 0, 0);
-  } else if (S && A) {
-    Serial.println("Mundur Kiri");
-    SwerveDrive(-0.3, 0.3, 0, 0);
-  } else if (W) {
-    Serial.println("MAJU");
-    SwerveDrive(0.3, 0, 0, 0);
-  } else if (S) {
-    Serial.println("Mundur");
-    // SwerveDrive(-0.3, 0, 0, 0);
-    while (1) {
-      fedback();
-      SwerveDrive(0.3, 0, 0, 30);
-      if (Fedback_Pulse[1] == 346) {
-        STOP_ALL();
-        break;
-      }
-    }
-  } else if (A) {
-    Serial.println("kiri");
-    SwerveDrive(0, 0.3, 0, 0);
-  } else if (D) {
-    Serial.println("kanan");
-    SwerveDrive(0, -0.3, 0, 0);
-  } else if (J) {
-    SwerveDrive(0, 0, 0.3, 0);
-    Serial.println("CCW");
-  } else if (K) {
-    SwerveDrive(0, 0, -0.3, 0);
-    Serial.println("CW");
-  } else if (STOP) {
-    STOP_ALL();
-    Serial.println("Stop");
-  } else if (P) {
-    STOP_ALL();
-    Serial.println("Stop");
-  } else if (H) {
-    HOME_ALL();
-    Serial.println("HOMING");
-  }
+  // CommunicationESP();
+  // if (W && D) {
+  //   Serial.println("MAJU KANAN");
+  //   SwerveDrive(0.3, -0.3, 0, 0);
+  // } else if (W && A) {
+  //   Serial.println("MAJU Kiri");
+  //   SwerveDrive(0.3, 0.3, 0, 0);
+  // } else if (S && D) {
+  //   Serial.println("Mundur KANAN");
+  //   SwerveDrive(-0.3, -0.3, 0, 0);
+  // } else if (S && A) {
+  //   Serial.println("Mundur Kiri");
+  //   SwerveDrive(-0.3, 0.3, 0, 0);
+  // } else if (W) {
+  //   Serial.println("MAJU");
+  //   SwerveDrive(0.3, 0, 0, 0);
+  // } else if (S) {
+  //   Serial.println("Mundur");
+  //   // SwerveDrive(-0.3, 0, 0, 0);
+  //   while (1) {
+  //     fedback();
+  //     SwerveDrive(0.3, 0, 0, 30);
+  //     if (Fedback_Pulse[1] == 346) {
+  //       STOP_ALL();
+  //       break;
+  //     }
+  //   }
+  // } else if (A) {
+  //   Serial.println("kiri");
+  //   SwerveDrive(0, 0.3, 0, 0);
+  // } else if (D) {
+  //   Serial.println("kanan");
+  //   SwerveDrive(0, -0.3, 0, 0);
+  // } else if (J) {
+  //   SwerveDrive(0, 0, 0.3, 0);
+  //   Serial.println("CCW");
+  // } else if (K) {
+  //   SwerveDrive(0, 0, -0.3, 0);
+  //   Serial.println("CW");
+  // } else if (STOP) {
+  //   STOP_ALL();
+  //   Serial.println("Stop");
+  // } else if (P) {
+  //   STOP_ALL();
+  //   Serial.println("Stop");
+  // } else if (H) {
+  //   HOME_ALL();
+  //   Serial.println("HOMING");
+  // }
+  // if (Serial.available()) {
+  //   String cmd = Serial.readStringUntil('\n');
+  //   cmd.trim();
+  //   if (cmd.length() == 0) return;
+
+  //   cmd.toUpperCase();
+  //   if (cmd == "G") {
+  //     TEST(0);
+  //   } else if (cmd == "S") {
+  //     STOP_ALL();
+  //   } else if (cmd == "H") {
+  //     HOME_ALL();
+  //   }
+  // }
 }
-
-// if (Serial.available()) {
-//   String cmd = Serial.readStringUntil('\n');
-//   cmd.trim();
-//   if (cmd.length() == 0) return;
-
-//   cmd.toUpperCase();
-//   if (cmd == "G") {
-//     TEST(0);
-//   } else if (cmd == "S") {
-//     STOP_ALL();
-//   } else if (cmd == "H") {
-//     HOME_ALL();
-//   }
-// }
