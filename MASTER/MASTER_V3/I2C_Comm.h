@@ -77,6 +77,24 @@ void I2C_SendOdometry(float yaw_val,
   }
 }
 
+void I2C_ScanBus() {
+  Serial.println("[I2C] Scanning bus for devices...");
+  bool found = false;
+  for (byte address = 1; address < 127; address++) {
+    Wire.beginTransmission(address);
+    int error = Wire.endTransmission();
+    if (error == 0) {
+      Serial.print("[I2C] Device found at 0x");
+      if (address < 16) Serial.print("0");
+      Serial.println(address, HEX);
+      found = true;
+    }
+  }
+  if (!found) {
+    Serial.println("[I2C] No devices found on the bus.");
+  }
+}
+
 // ==================== I2C SLAVE VARIABLES ====================
 volatile char ble_command = '0';
 volatile float i2c_yaw = 0;

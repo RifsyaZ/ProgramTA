@@ -16,6 +16,7 @@ void setup() {
 
   I2C_Master_Init();  // Initialize I2C Master
   delay(100);
+  I2C_ScanBus();
   Serial.println("[MASTER] I2C Ready!");
 
   pinMode(BUZZER_PIN, OUTPUT);
