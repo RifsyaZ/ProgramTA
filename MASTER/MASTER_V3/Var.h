@@ -24,6 +24,9 @@ HardwareSerial Serial3(RX_ID2, TX_ID2);
 #define TX_ID4 PC6
 HardwareSerial Serial6(RX_ID4, TX_ID4);
 
+#define RX_ESP PB7
+#define TX_ESP PB6 //scl putih
+HardwareSerial mySerialBLE(RX_ESP, TX_ESP);
 
 //---------------------- Variabel MPU && data Fedback Stering & Pulsa encoder ----------------------//
 float yaw;

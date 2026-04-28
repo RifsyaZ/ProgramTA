@@ -2,30 +2,21 @@
 #include <BLEServer.h>
 #include <BLEUtils.h>
 #include <BLE2902.h>
-#include <Wire.h>
-
-#define I2C_SLAVE_ADDR 0x08
-#define I2C_SDA_PIN 8
-#define I2C_SCL_PIN 9
-#define SERVICE_UUID "12345678-1234-1234-1234-123456789abc"
-#define CHARACTERISTIC_UUID "abcd1234-5678-1234-5678-abcdef123456"
-
-volatile char ble_command = '0';
-volatile float i2c_yaw = 0;
-volatile float i2c_angles[4] = {0, 0, 0, 0};
-volatile int i2c_pulses[4] = {0, 0, 0, 0};
 
 BLECharacteristic *pCharacteristic;
 bool deviceConnected = false;
 
+#define SERVICE_UUID        "12345678-1234-1234-1234-123456789abc"
+#define CHARACTERISTIC_UUID "abcd1234-5678-1234-5678-abcdef123456"
+
 // ================= CALLBACK CONNECT =================
-class MyServerCallbacks : public BLEServerCallbacks {
-  void onConnect(BLEServer *pServer) {
+class MyServerCallbacks: public BLEServerCallbacks {
+  void onConnect(BLEServer* pServer) {
     deviceConnected = true;
     Serial.println("Client Connected");
   };
 
-  void onDisconnect(BLEServer *pServer) {
+  void onDisconnect(BLEServer* pServer) {
     deviceConnected = false;
     Serial.println("Client Disconnected");
   }
@@ -37,109 +28,31 @@ class MyCallbacks: public BLECharacteristicCallbacks {
     std::string value = pCharacteristic->getValue();
 
     if (value.length() > 0) {
-      char cmd = value[0];  // Ambil karakter pertama
-      Serial.print("[BLE RX] Command: ");
-      Serial.println(cmd);
-      
-      // Set command untuk dikirim ke Master via I2C
-      ble_command = cmd;
+      Serial.print("Command: ");
+      Serial.println(value.c_str());
 
-      if (cmd == 'F') {
+      if (value == "F") {
         Serial.println("MAJU");
       }
-      else if (cmd == 'B') {
+      else if (value == "B") {
         Serial.println("MUNDUR");
       }
-      else if (cmd == 'L') {
+      else if (value == "L") {
         Serial.println("KIRI");
       }
-      else if (cmd == 'R') {
+      else if (value == "R") {
         Serial.println("KANAN");
       }
-      else if (cmd == 'S') {
+      else if (value == "S") {
         Serial.println("STOP");
       }
     }
   }
 };
 
-// ===== I2C SLAVE HANDLERS =====
-void onI2CRequest() {
-  Serial.println("[I2C] onRequest called");
-  Wire.write(ble_command);  // Kirim command ke Master
-  ble_command = '0';         // Clear
-}
-
-void onI2CReceive(int len) {
-  Serial.print("[I2C] onReceive called, len=");
-  Serial.println(len);
-  if (len == 0) return;
-  byte data_type = Wire.read();
-  len--;
-  Serial.print("[I2C] Data type: ");
-  Serial.println(data_type);
-  
-  if (data_type == 0x02) {  // Odometry data
-    // Baca yaw
-    byte yaw_bytes[4];
-    for(int i = 0; i < 4 && Wire.available(); i++) {
-      yaw_bytes[i] = Wire.read();
-    }
-    memcpy((void*)&i2c_yaw, yaw_bytes, 4);
-    
-    // Baca angles
-    for(int j = 0; j < 4; j++) {
-      byte angle_bytes[4];
-      for(int i = 0; i < 4 && Wire.available(); i++) {
-        angle_bytes[i] = Wire.read();
-      }
-      memcpy((void*)&i2c_angles[j], angle_bytes, 4);
-    }
-    
-    // Baca pulses
-    for(int j = 0; j < 4; j++) {
-      byte pulse_bytes[2];
-      for(int i = 0; i < 2 && Wire.available(); i++) {
-        pulse_bytes[i] = Wire.read();
-      }
-      memcpy((void*)&i2c_pulses[j], pulse_bytes, 2);
-    }
-    
-    Serial.print("[I2C RX] Odometry - YAW: ");
-    Serial.print(i2c_yaw);
-    Serial.print(" Angles: ");
-    for(int i = 0; i < 4; i++) {
-      Serial.print(i2c_angles[i]);
-      Serial.print(" ");
-    }
-    Serial.print(" Pulses: ");
-    for(int i = 0; i < 4; i++) {
-      Serial.print(i2c_pulses[i]);
-      Serial.print(" ");
-    }
-    Serial.println();
-  }
-  
-  while(Wire.available()) Wire.read();
-}
-
 void setup() {
   Serial.begin(115200);
-  delay(100);
-  
-  // ===== INISIALISASI I2C SLAVE =====
-  Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN, I2C_SLAVE_ADDR);  // SDA=GPIO10, SCL=GPIO8
-  Wire.onRequest(onI2CRequest);
-  Wire.onReceive(onI2CReceive);
-  Serial.print("[I2C] Slave initialized on 0x");
-  Serial.print(I2C_SLAVE_ADDR, HEX);
-  Serial.print(" SDA=");
-  Serial.print(I2C_SDA_PIN);
-  Serial.print(" SCL=");
-  Serial.println(I2C_SCL_PIN);
-  delay(100);
 
-  // ===== INISIALISASI BLE =====
   BLEDevice::init("ESP32-C3-BLE");
 
   BLEServer *pServer = BLEDevice::createServer();
@@ -148,8 +61,10 @@ void setup() {
   BLEService *pService = pServer->createService(SERVICE_UUID);
 
   pCharacteristic = pService->createCharacteristic(
-    CHARACTERISTIC_UUID,
-    BLECharacteristic::PROPERTY_NOTIFY | BLECharacteristic::PROPERTY_WRITE);
+                      CHARACTERISTIC_UUID,
+                      BLECharacteristic::PROPERTY_NOTIFY |
+                      BLECharacteristic::PROPERTY_WRITE
+                    );
 
   pCharacteristic->addDescriptor(new BLE2902());
   pCharacteristic->setCallbacks(new MyCallbacks());
@@ -159,7 +74,7 @@ void setup() {
   BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
   pAdvertising->start();
 
-  Serial.println("[BLE] Waiting for client...");
+  Serial.println("Waiting for client...");
 }
 
 void loop() {
