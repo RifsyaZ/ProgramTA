@@ -5,8 +5,8 @@
 #include <Wire.h>
 
 #define I2C_SLAVE_ADDR 0x08
-#define I2C_SDA_PIN 10
-#define I2C_SCL_PIN 8
+#define I2C_SDA_PIN 8
+#define I2C_SCL_PIN 9
 #define SERVICE_UUID "12345678-1234-1234-1234-123456789abc"
 #define CHARACTERISTIC_UUID "abcd1234-5678-1234-5678-abcdef123456"
 
@@ -128,7 +128,7 @@ void setup() {
   delay(100);
   
   // ===== INISIALISASI I2C SLAVE =====
-  Wire.begin(I2C_SLAVE_ADDR, I2C_SDA_PIN, I2C_SCL_PIN);  // SDA=GPIO10, SCL=GPIO8
+  Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN, I2C_SLAVE_ADDR);  // SDA=GPIO10, SCL=GPIO8
   Wire.onRequest(onI2CRequest);
   Wire.onReceive(onI2CReceive);
   Serial.print("[I2C] Slave initialized on 0x");
