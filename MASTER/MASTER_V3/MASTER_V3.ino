@@ -36,9 +36,10 @@ void setup() {
 
 // ==================== LOOP ====================
 void loop() {
-  MPU1();
-  fedback();
-  Debug_odometry();
+  Serial1.println("4 : 30 : 30");
+  // MPU1();
+  // fedback();
+  // Debug_odometry();
   // CommunicationESP();
   // if (W && D) {
   //   Serial.println("MAJU KANAN");
@@ -60,7 +61,7 @@ void loop() {
   //   // SwerveDrive(-0.3, 0, 0, 0);
   //   while (1) {
   //     fedback();
-  SwerveDrive(0.3, 0, 0, 30);
+  // SwerveDrive(0.3, 0, 0, 30);
   //     if (Fedback_Pulse[1] == 346) {
   //       STOP_ALL();
   //       break;

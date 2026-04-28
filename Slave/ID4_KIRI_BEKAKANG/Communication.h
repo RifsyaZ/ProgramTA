@@ -9,17 +9,13 @@
 void commandTask(void *pvParameters);
 void displayTask(void *pvParameters);
 void rs485Task(void *pvParameters);
-void rs485RealtimeTask(void *pvParameters);
-void guiOutputTask(void *pvParameters);
+void debugUsbSlaveTask(void *pvParameters);
 void parseCommand(String cmd);
 void parseRs485Command(String cmd);
-void printHelp();
 void printSystemStatus();
 void executeSwerveCommand(float angle, float rpm);
-void sendRs485Response(String response);
-void sendRs485RealtimeData();
-void sendGuiData();
-void sendGuiData();
+void debugUsbSlave();
+// void sendGuiData();
 
 // ==================== COMMUNICATION IMPLEMENTATIONS ====================
 #pragma region Communication_Implementations
@@ -59,7 +55,12 @@ void parseCommand(String cmd) {
   }
   
   if (cmd == "HELP" || cmd == "H") {
-    printHelp();
+    // Note: Help commands - A[angle]R[rpm], STOP, STATUS, HOME
+    if (serialMutex != NULL) {
+      xSemaphoreTake(serialMutex, portMAX_DELAY);
+      Serial.println("Commands: A[angle]R[rpm] e.g. A45R20, STOP, STATUS, HOME");
+      xSemaphoreGive(serialMutex);
+    }
     return;
   }
   
@@ -108,7 +109,7 @@ void parseCommand(String cmd) {
   
   if (serialMutex != NULL) {
     xSemaphoreTake(serialMutex, portMAX_DELAY);
-    Serial.println("❌ Command tidak dikenal! Gunakan HELP");
+    Serial.println("❌ Command tidak dikenal! Gunakan STATUS");
     xSemaphoreGive(serialMutex);
   }
 }
@@ -117,48 +118,86 @@ void sendRs485Response(String response) {
   Serial1.println(response);
 }
 
-void parseRs485Command(String cmd) {
-  int firstColon = cmd.indexOf(':');
-  
-  if (firstColon <= 0) {
-    sendRs485Response("ERROR:INVALID_FORMAT");
-    return;
+bool isIntegerString(const String &value) {
+  if (value.length() == 0) return false;
+  int start = 0;
+  if (value[0] == '+' || value[0] == '-') {
+    if (value.length() == 1) return false;
+    start = 1;
   }
-  
+  for (int i = start; i < value.length(); i++) {
+    char c = value[i];
+    if (c < '0' || c > '9') return false;
+  }
+  return true;
+}
+
+bool isNumericString(const String &value) {
+  if (value.length() == 0) return false;
+  int start = 0;
+  if (value[0] == '+' || value[0] == '-') {
+    if (value.length() == 1) return false;
+    start = 1;
+  }
+  bool hasDecimal = false;
+  for (int i = start; i < value.length(); i++) {
+    char c = value[i];
+    if (c == '.') {
+      if (hasDecimal) return false;
+      hasDecimal = true;
+      continue;
+    }
+    if (c < '0' || c > '9') return false;
+  }
+  return true;
+}
+
+void parseRs485Command(String cmd) {
+  cmd.trim();
+  if (cmd.length() == 0) return;
+
+  int firstColon = cmd.indexOf(':');
+  if (firstColon <= 0) return;
+
   String idStr = cmd.substring(0, firstColon);
-  
+  idStr.trim();
+
   // ===== FORMAT ALL: BROADCAST DENGAN NILAI BERBEDA =====
   if (idStr == "ALL" || idStr == "all") {
     // Format: ALL:angle1,rpm1:angle2,rpm2:angle3,rpm3:angle4,rpm4
     // Slave akan ambil sesuai ID-nya
-    
+
     String data = cmd.substring(firstColon + 1);
-    
+
     // Split berdasarkan ":"
     int pos = 0;
-    int wheelData[4][2];  // [index][0]=angle, [index][1]=rpm (pakai int sementara)
     int wheelIndex = 0;
-    
+
     while (pos < data.length() && wheelIndex < 4) {
       int nextColon = data.indexOf(':', pos);
       String wheelStr;
-      
+
       if (nextColon == -1) {
         wheelStr = data.substring(pos);
       } else {
         wheelStr = data.substring(pos, nextColon);
       }
-      
+      wheelStr.trim();
+
       // Parse angle,rpm
       int comma = wheelStr.indexOf(',');
       if (comma > 0) {
-        float angle = wheelStr.substring(0, comma).toFloat();
-        float rpm = wheelStr.substring(comma + 1).toFloat();
-        
+        String angleStr = wheelStr.substring(0, comma);
+        String rpmStr = wheelStr.substring(comma + 1);
+        angleStr.trim();
+        rpmStr.trim();
+        float angle = angleStr.toFloat();
+        float rpm = rpmStr.toFloat();
+
         // Cek apakah ini untuk slave ini
         if ((wheelIndex + 1) == RS485_SLAVE_ID) {
           executeSwerveCommand(angle, rpm);
-          
+
           if (serialMutex != NULL) {
             xSemaphoreTake(serialMutex, portMAX_DELAY);
             Serial.print("📡 ALL [Roda ");
@@ -171,29 +210,29 @@ void parseRs485Command(String cmd) {
           }
         }
       }
-      
+
       wheelIndex++;
       if (nextColon == -1) break;
       pos = nextColon + 1;
     }
-    
+
     return;
   }
-  
-  // ===== FORMAT HOME/HOMING =====
-  String afterId = cmd.substring(firstColon + 1);
-  afterId.toUpperCase();
-  
+
+  if (!isIntegerString(idStr)) return;
   int slaveId = idStr.toInt();
   if (slaveId != RS485_SLAVE_ID) return;
-  
+
+  String afterId = cmd.substring(firstColon + 1);
+  afterId.trim();
+  afterId.toUpperCase();
+
   if (afterId == "HOME" || afterId == "HOMING") {
     homing_handleCommand("HOME");
     sendRs485Response("OK:" + String(RS485_SLAVE_ID) + ":HOME");
     return;
   }
-  
-  // ===== FORMAT STOP =====
+
   if (afterId == "STOP") {
     SwerveCommand_t stopCmd;
     stopCmd.stop_all = true;
@@ -202,17 +241,24 @@ void parseRs485Command(String cmd) {
     sendRs485Response("OK:" + String(RS485_SLAVE_ID) + ":STOP");
     return;
   }
-  
-  // ===== FORMAT ID:ANGLE:RPM =====
+
   int secondColon = cmd.indexOf(':', firstColon + 1);
-  if (secondColon > firstColon) {
-    float angle = cmd.substring(firstColon + 1, secondColon).toFloat();
-    float rpm = cmd.substring(secondColon + 1).toFloat();
-    
-    executeSwerveCommand(angle, rpm);
-    sendRs485Response("OK:" + String(RS485_SLAVE_ID) + ":A" + String(angle) + ":R" + String(rpm));
-  }
+  if (secondColon <= firstColon) return;
+
+  String angleStr = cmd.substring(firstColon + 1, secondColon);
+  String rpmStr = cmd.substring(secondColon + 1);
+  angleStr.trim();
+  rpmStr.trim();
+
+  if (!isNumericString(angleStr) || !isNumericString(rpmStr)) return;
+
+  float angle = angleStr.toFloat();
+  float rpm = rpmStr.toFloat();
+
+  executeSwerveCommand(angle, rpm);
+  sendRs485Response("OK:" + String(RS485_SLAVE_ID) + ":A" + String(angle) + ":R" + String(rpm));
 }
+
 // void parseRs485Command(String cmd) {
 //   int firstColon = cmd.indexOf(':');
   
@@ -284,23 +330,7 @@ void parseRs485Command(String cmd) {
 //     sendRs485Response("ERROR:INVALID_FORMAT");
 //   }
 // }
-
-void sendRs485RealtimeData() {
-  int ready = steer_targetReached ? 1 : 0;
-  int pwm_pos = (int)steer_currentOutput;
-  int pwm_spd = drive_pwmOutput;
-  
-  String output = String(RS485_SLAVE_ID) + ":" + 
-                  String(steerAngleDeg, 1) + "," +
-                  String(drive_wheelRpm, 1) + "," +
-                  String(pwm_pos) + "," +
-                  String(pwm_spd) + "," +
-                  String(ready);
-  
-  Serial1.println(output);
-}
-
-void sendGuiData() {
+void debugUsbSlave() {
   int ready = steer_targetReached ? 1 : 0;
   int pwm_pos = (int)steer_currentOutput;
   int pwm_spd = drive_pwmOutput;
@@ -314,26 +344,13 @@ void sendGuiData() {
   
   Serial.println(output);
 }
-
-void rs485RealtimeTask(void *pvParameters) {
-  TickType_t xLastWakeTime = xTaskGetTickCount();
-  const TickType_t xFrequency = pdMS_TO_TICKS(50);
-  
-  vTaskDelay(pdMS_TO_TICKS(500));
-  
-  while(1) {
-    vTaskDelayUntil(&xLastWakeTime, xFrequency);
-    sendRs485RealtimeData();
-  }
-}
-
-void guiOutputTask(void *pvParameters) {
+void debugUsbSlaveTask(void *pvParameters) {
   TickType_t xLastWakeTime = xTaskGetTickCount();
   const TickType_t xFrequency = pdMS_TO_TICKS(50);
   
   while(1) {
     vTaskDelayUntil(&xLastWakeTime, xFrequency);
-    sendGuiData();
+    debugUsbSlave();
   }
 }
 
@@ -381,42 +398,27 @@ void printSystemStatus() {
   if (serialMutex != NULL) {
     xSemaphoreTake(serialMutex, portMAX_DELAY);
     
-    Serial.println("\n╔════════════════════════════════════════════╗");
-    Serial.println("║            SYSTEM STATUS                   ║");
-    Serial.println("╚════════════════════════════════════════════╝");
-    
-    Serial.println("\n🎯 STEERING:");
-    Serial.print("  Posisi: ");
+    Serial.println("\n=== STATUS ===");
+    Serial.print("STEER: ");
     Serial.print(steerAngleDeg, 1);
-    Serial.print("° | Target: ");
+    Serial.print("° -> ");
     Serial.print(steerRawTargetAngle, 1);
-    Serial.print("° | PWM: ");
+    Serial.print("° PWM:");
     Serial.println(steer_currentOutput, 0);
     
-    Serial.println("\n⚡ DRIVING:");
-    Serial.print("  RPM: ");
+    Serial.print("DRIVE: ");
     Serial.print(drive_wheelRpm, 1);
-    Serial.print(" | Target: ");
+    Serial.print(" RPM -> ");
     Serial.print(drive_wheelRpmTarget_requested, 1);
-    Serial.print(" | PWM: ");
+    Serial.print(" PWM:");
     Serial.println(drive_pwmOutput);
     
-    Serial.print("  Status: ");
-    if (steer_targetReached) Serial.print("STEER READY | ");
-    else Serial.print("STEER MOVING | ");
+    Serial.print("STATUS: ");
+    if (steer_targetReached) Serial.print("STEER OK | ");
+    else Serial.print("STEER MOV | ");
     
-    if (driving_active) Serial.println("DRIVE ACTIVE");
-    else Serial.println("DRIVE IDLE");
-    
-    Serial.println("\n📤 OUTPUT KE GUI (USB):");
-    Serial.print("  Format: ");
-    Serial.println("ID:angle,rpm,pwm_pos,pwm_spd,ready");
-    
-    Serial.println("\n📤 OUTPUT RS485 REALTIME:");
-    Serial.print("  Format: ");
-    Serial.println("ID:angle,rpm,pwm_pos,pwm_spd,ready (50ms)");
-    
-    Serial.println("\n============================================\n");
+    if (driving_active) Serial.println("DRIVE ON");
+    else Serial.println("DRIVE OFF");
     
     xSemaphoreGive(serialMutex);
   }
