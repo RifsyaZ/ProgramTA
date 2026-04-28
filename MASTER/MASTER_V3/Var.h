@@ -1,3 +1,7 @@
+//----------------------- Konfigurasi ESP ------------------------//
+#define SLAVE_ADDR 0x08
+uint8_t buffer[36];
+
 //----------------------- konfigurasi PIN Serial Untuk Komunikasi ke Semua Slave ------------------------//
 #define RS485_TX_PIN PA9
 #define RS485_RX_PIN PA10
@@ -23,10 +27,6 @@ HardwareSerial Serial3(RX_ID2, TX_ID2);
 #define RX_ID4 PC7
 #define TX_ID4 PC6
 HardwareSerial Serial6(RX_ID4, TX_ID4);
-
-#define RX_ESP PB7
-#define TX_ESP PB6 //scl putih
-HardwareSerial mySerialBLE(RX_ESP, TX_ESP);
 
 //---------------------- Variabel MPU && data Fedback Stering & Pulsa encoder ----------------------//
 float yaw;

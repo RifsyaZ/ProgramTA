@@ -103,10 +103,3 @@ void Debug_odometry() {
 
   Serial.println("");
 }
-
-void EPS32() {
-  while (mySerialBLE.available()) {
-    String data = mySerialBLE.readStringUntil('\n');
-    Serial.println(data);
-  }
-}
