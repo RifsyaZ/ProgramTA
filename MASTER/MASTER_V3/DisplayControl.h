@@ -1,15 +1,15 @@
 void parseCommand(String cmd) {
   // Reset semua flag
-  isForward = false;
-  isBackward = false;
-  isLeft = false;
-  isRight = false;
-  isJump = false;
-  isKill = false;
-  isStop = false;
+  W = false;
+  S = false;
+  A = false;
+  D = false;
+  J = false;
+  K = false;
+  STOP = false;
 
   if (cmd == "S") {
-    isStop = true;
+    STOP = true;
     return;
   }
 
@@ -18,24 +18,24 @@ void parseCommand(String cmd) {
   int end = cmd.indexOf(',');
   while (end != -1) {
     String part = cmd.substring(start, end);
-    if (part == "F") isForward = true;
-    else if (part == "B") isBackward = true;
-    else if (part == "L") isLeft = true;
-    else if (part == "R") isRight = true;
-    else if (part == "J") isJump = true;
-    else if (part == "K") isKill = true;
+    if (part == "F") W = true;
+    else if (part == "B") S = true;
+    else if (part == "L") A = true;
+    else if (part == "R") D = true;
+    else if (part == "J") J = true;
+    else if (part == "K") K = true;
     start = end + 1;
     end = cmd.indexOf(',', start);
   }
 
   // Last part
   String part = cmd.substring(start);
-  if (part == "F") isForward = true;
-  else if (part == "B") isBackward = true;
-  else if (part == "L") isLeft = true;
-  else if (part == "R") isRight = true;
-  else if (part == "J") isJump = true;
-  else if (part == "K") isKill = true;
+  if (part == "F") W = true;
+  else if (part == "B") S = true;
+  else if (part == "L") A = true;
+  else if (part == "R") D = true;
+  else if (part == "J") J = true;
+  else if (part == "K") K = true;
 }
 
 void CommunicationESP(){

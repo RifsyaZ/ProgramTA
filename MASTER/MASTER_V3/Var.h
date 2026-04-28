@@ -34,13 +34,13 @@ static float Fedback_Angle[4] = { 0, 0, 0, 0 };
 static float Fedback_Pulse[4] = { 0, 0, 0, 0 };
 
 // Variabel untuk command dari ESP32
-bool isForward = false;
-bool isBackward = false;
-bool isLeft = false;
-bool isRight = false;
-bool isJump = false;
-bool isKill = false;
-bool isStop = false;
+bool W = false;
+bool S = false;
+bool A = false;
+bool D = false;
+bool J = false;
+bool K = false;
+bool STOP = false;
 
 // ======================= KONFIGURASI ROBOT =======================
 #define PI 3.14159265359f

@@ -40,10 +40,39 @@ void loop() {
   fedback();
   Debug_odometry();
   CommunicationESP();
-  if (isForward && isRight) {
+  if (W && D) {
     Serial.println("MAJU KANAN");
-  }  else if (isForward && isLeft) {
+    SwerveDrive(0.3, -0.3, 0, 0);
+  } else if (W && A) {
     Serial.println("MAJU Kiri");
+    SwerveDrive(0.3, 0.3, 0, 0);
+  } else if (S && D) {
+    Serial.println("Mundur KANAN");
+    SwerveDrive(-0.3, -0.3, 0, 0);
+  } else if (S && A) {
+    Serial.println("Mundur Kiri");
+    SwerveDrive(-0.3, 0.3, 0, 0);
+  } else if (W) {
+    Serial.println("MAJU");
+    SwerveDrive(0.3, 0, 0, 0);
+  } else if (S) {
+    Serial.println("Mundur");
+    SwerveDrive(-0.3, 0, 0, 0);
+  } else if (A) {
+    Serial.println("kiri");
+    SwerveDrive(0, 0.3, 0, 0);
+  } else if (D) {
+    Serial.println("Mundur");
+    SwerveDrive(0, -0.3, 0, 0);
+  } else if (J) {
+    SwerveDrive(0, 0, 0.3, 0);
+    Serial.println("CCW");
+  } else if (K) {
+    SwerveDrive(0, 0, -0.3, 0);
+    Serial.println("CW");
+  } else if (STOP) {
+    STOP_ALL();
+    Serial.println("Stop");
   }
 }
 

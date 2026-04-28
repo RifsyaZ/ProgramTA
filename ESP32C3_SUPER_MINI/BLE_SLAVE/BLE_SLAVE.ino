@@ -47,7 +47,6 @@ void onReceive(int len) {
     }
   }
 
-  // 🔥 kalau data lengkap
   if (receivedBytes >= 36) {
 
     float A[4], P[4], yaw;
@@ -56,7 +55,6 @@ void onReceive(int len) {
     memcpy(P, rxBuffer + 16, 16);
     memcpy(&yaw, rxBuffer + 32, 4);
 
-    // 🔥 DEBUG FORMAT SESUAI PERMINTAAN
     Serial.print(A[0]); Serial.print(" ");
     Serial.print(P[0]); Serial.print("        ");
 
@@ -86,13 +84,12 @@ void onRequest() {
   }
 
   Wire.write(response.c_str());
-  // bleCommand = "";  // 🔥 HAPUS INI agar command tetap sampai ada update baru
 }
 
 // ================= SETUP =================
 void setup() {
   Serial.begin(115200);
-  bleCommand = "S";  // 🔥 Default command: Stop
+  bleCommand = "S";
 
   Wire.begin(SLAVE_ADDR);
   Wire.onReceive(onReceive);
@@ -128,8 +125,6 @@ void setup() {
 
 // ================= LOOP =================
 void loop() {
-
-  // 🔥 KIRIM DATA KE BLE
   if (deviceConnected && receivedBytes == 0) {
     pCharacteristic->setValue(rxBuffer, 36);
     pCharacteristic->notify();
