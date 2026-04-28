@@ -73,6 +73,12 @@ void loop() {
   } else if (STOP) {
     STOP_ALL();
     Serial.println("Stop");
+  } else if (P) {
+    STOP_ALL();
+    Serial.println("Stop");
+  } else if (H) {
+    HOME_ALL();
+    Serial.println("HOMING");
   }
 }
 

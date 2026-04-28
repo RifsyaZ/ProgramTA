@@ -6,6 +6,8 @@ void parseCommand(String cmd) {
   D = false;
   J = false;
   K = false;
+  P = false;
+  H = false;
   STOP = false;
 
   if (cmd == "S") {
@@ -24,6 +26,8 @@ void parseCommand(String cmd) {
     else if (part == "R") D = true;
     else if (part == "J") J = true;
     else if (part == "K") K = true;
+    else if (part == "P") J = true;
+    else if (part == "H") K = true;
     start = end + 1;
     end = cmd.indexOf(',', start);
   }
@@ -36,16 +40,18 @@ void parseCommand(String cmd) {
   else if (part == "R") D = true;
   else if (part == "J") J = true;
   else if (part == "K") K = true;
+  else if (part == "P") P = true;
+  else if (part == "H") H = true;
 }
 
-void CommunicationESP(){
+void CommunicationESP() {
   memcpy(buffer, Fedback_Angle, 16);
   memcpy(buffer + 16, Fedback_Pulse, 16);
   memcpy(buffer + 32, &yaw, 4);
 
   // Serial.print("KIRIM STM: ");
   // for (int i = 0; i < 36; i++) {
-    // Serial.print(buffer[i]); Serial.print(" ");
+  // Serial.print(buffer[i]); Serial.print(" ");
   // }
   // Serial.println();
 

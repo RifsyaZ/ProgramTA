@@ -7,7 +7,7 @@ DEVICE_NAME = "ESP32-C3-BLE"
 CHAR_UUID = "abcd1234-5678-1234-5678-abcdef123456"
 
 pressed_keys = set()
-running = True   # 🔥 FLAG RUNNING
+running = True
 
 # ================= BUILD COMMAND =================
 def build_command():
@@ -19,6 +19,8 @@ def build_command():
     if 'd' in pressed_keys: cmd.append("R")
     if 'j' in pressed_keys: cmd.append("J")
     if 'k' in pressed_keys: cmd.append("K")
+    if 'p' in pressed_keys: cmd.append("P")
+    if 'h' in pressed_keys: cmd.append("H")
 
     if 'space' in pressed_keys:
         return "S"
@@ -106,6 +108,8 @@ async def main():
 
         print("\n=== CONTROL ===")
         print("WASD + J/K = gerak")
+        print("P = STOP")
+        print("H = HOME")
         print("SPACE = STOP")
         print("Q = EXIT\n")
 
