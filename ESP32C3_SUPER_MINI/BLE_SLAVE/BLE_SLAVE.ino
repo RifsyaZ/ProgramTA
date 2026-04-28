@@ -86,12 +86,13 @@ void onRequest() {
   }
 
   Wire.write(response.c_str());
-  bleCommand = "";
+  // bleCommand = "";  // 🔥 HAPUS INI agar command tetap sampai ada update baru
 }
 
 // ================= SETUP =================
 void setup() {
   Serial.begin(115200);
+  bleCommand = "S";  // 🔥 Default command: Stop
 
   Wire.begin(SLAVE_ADDR);
   Wire.onReceive(onReceive);

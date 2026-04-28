@@ -7,7 +7,7 @@
 
 // ==================== SETUP ====================
 void setup() {
-  Serial.begin(115200);   // Serial Monitor
+  Serial.begin(115200);  // Serial Monitor
   Wire.begin();
   Serial1.begin(115200);  // RS485 ke motor
   Serial2.begin(115200);  // Feedback dari ID1
@@ -40,19 +40,24 @@ void loop() {
   fedback();
   Debug_odometry();
   CommunicationESP();
+  if (isForward && isRight) {
+    Serial.println("MAJU KANAN");
+  }  else if (isForward && isLeft) {
+    Serial.println("MAJU Kiri");
+  }
 }
 
-  // if (Serial.available()) {
-  //   String cmd = Serial.readStringUntil('\n');
-  //   cmd.trim();
-  //   if (cmd.length() == 0) return;
+// if (Serial.available()) {
+//   String cmd = Serial.readStringUntil('\n');
+//   cmd.trim();
+//   if (cmd.length() == 0) return;
 
-  //   cmd.toUpperCase();
-  //   if (cmd == "G") {
-  //     TEST(0);
-  //   } else if (cmd == "S") {
-  //     STOP_ALL();
-  //   } else if (cmd == "H") {
-  //     HOME_ALL();
-  //   }
-  // }
+//   cmd.toUpperCase();
+//   if (cmd == "G") {
+//     TEST(0);
+//   } else if (cmd == "S") {
+//     STOP_ALL();
+//   } else if (cmd == "H") {
+//     HOME_ALL();
+//   }
+// }
