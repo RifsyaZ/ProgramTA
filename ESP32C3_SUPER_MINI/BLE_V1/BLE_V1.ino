@@ -5,6 +5,8 @@
 #include <Wire.h>
 
 #define I2C_SLAVE_ADDR 0x08
+#define I2C_SDA_PIN 10
+#define I2C_SCL_PIN 8
 #define SERVICE_UUID "12345678-1234-1234-1234-123456789abc"
 #define CHARACTERISTIC_UUID "abcd1234-5678-1234-5678-abcdef123456"
 
@@ -63,14 +65,19 @@ class MyCallbacks: public BLECharacteristicCallbacks {
 
 // ===== I2C SLAVE HANDLERS =====
 void onI2CRequest() {
+  Serial.println("[I2C] onRequest called");
   Wire.write(ble_command);  // Kirim command ke Master
   ble_command = '0';         // Clear
 }
 
 void onI2CReceive(int len) {
+  Serial.print("[I2C] onReceive called, len=");
+  Serial.println(len);
   if (len == 0) return;
   byte data_type = Wire.read();
   len--;
+  Serial.print("[I2C] Data type: ");
+  Serial.println(data_type);
   
   if (data_type == 0x02) {  // Odometry data
     // Baca yaw
@@ -105,6 +112,11 @@ void onI2CReceive(int len) {
       Serial.print(i2c_angles[i]);
       Serial.print(" ");
     }
+    Serial.print(" Pulses: ");
+    for(int i = 0; i < 4; i++) {
+      Serial.print(i2c_pulses[i]);
+      Serial.print(" ");
+    }
     Serial.println();
   }
   
@@ -116,10 +128,15 @@ void setup() {
   delay(100);
   
   // ===== INISIALISASI I2C SLAVE =====
-  Wire.begin(I2C_SLAVE_ADDR, 10, 8);  // SDA=GPIO10, SCL=GPIO8
+  Wire.begin(I2C_SLAVE_ADDR, I2C_SDA_PIN, I2C_SCL_PIN);  // SDA=GPIO10, SCL=GPIO8
   Wire.onRequest(onI2CRequest);
   Wire.onReceive(onI2CReceive);
-  Serial.println("[I2C] Slave initialized on 0x08");
+  Serial.print("[I2C] Slave initialized on 0x");
+  Serial.print(I2C_SLAVE_ADDR, HEX);
+  Serial.print(" SDA=");
+  Serial.print(I2C_SDA_PIN);
+  Serial.print(" SCL=");
+  Serial.println(I2C_SCL_PIN);
   delay(100);
 
   // ===== INISIALISASI BLE =====

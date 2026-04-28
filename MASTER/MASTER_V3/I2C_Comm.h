@@ -9,6 +9,8 @@
 
 #define I2C_SLAVE_ADDR 0x08
 #define I2C_SPEED 400000
+#define I2C_SDA_PIN 7
+#define I2C_SCL_PIN 6
 
 // ==================== I2C MASTER FUNCTIONS ====================
 void I2C_Master_Init() {
@@ -19,15 +21,23 @@ void I2C_Master_Init() {
 
 // Baca command BLE dari ESP32
 char I2C_ReadBLECommand() {
+  Serial.println("[I2C] Requesting BLE command from ESP32...");
   Wire.beginTransmission(I2C_SLAVE_ADDR);
   Wire.write(0x01);  // Request command
-  Wire.endTransmission();
+  int err = Wire.endTransmission();
+  if (err != 0) {
+    Serial.print("[I2C] Request error: ");
+    Serial.println(err);
+  }
   
   delayMicroseconds(100);
   
   Wire.requestFrom(I2C_SLAVE_ADDR, 1);
   if (Wire.available()) {
-    return Wire.read();
+    char cmd = Wire.read();
+    Serial.print("[I2C] Received raw command: ");
+    Serial.println(cmd);
+    return cmd;
   }
   return '0';
 }
@@ -36,6 +46,7 @@ char I2C_ReadBLECommand() {
 void I2C_SendOdometry(float yaw_val, 
                       float ang_fl, float ang_fr, float ang_rl, float ang_rr,
                       int pls_fl, int pls_fr, int pls_rl, int pls_rr) {
+  Serial.println("[I2C] Sending odometry data to ESP32...");
   Wire.beginTransmission(I2C_SLAVE_ADDR);
   Wire.write(0x02);  // Data type: odometry
   
@@ -57,7 +68,13 @@ void I2C_SendOdometry(float yaw_val,
     for(int i = 0; i < 2; i++) Wire.write(ptr[i]);
   }
   
-  Wire.endTransmission();
+  int status = Wire.endTransmission();
+  if (status != 0) {
+    Serial.print("[I2C] Send odometry error: ");
+    Serial.println(status);
+  } else {
+    Serial.println("[I2C] Odometry data sent");
+  }
 }
 
 // ==================== I2C SLAVE VARIABLES ====================
