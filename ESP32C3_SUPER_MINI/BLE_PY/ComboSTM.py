@@ -7,6 +7,7 @@ DEVICE_NAME = "ESP32-C3-BLE"
 CHAR_UUID = "abcd1234-5678-1234-5678-abcdef123456"
 
 pressed_keys = set()
+running = True   # 🔥 FLAG RUNNING
 
 # ================= BUILD COMMAND =================
 def build_command():
@@ -29,15 +30,27 @@ def build_command():
 
 # ================= KEY =================
 def on_press(key):
+    global running
+
     try:
-        pressed_keys.add(key.char.lower())
+        k = key.char.lower()
+
+        # 🔥 TEKAN Q → KELUAR
+        if k == 'q':
+            print("Keluar...")
+            running = False
+            return
+
+        pressed_keys.add(k)
+
     except:
         if key == keyboard.Key.space:
             pressed_keys.add('space')
 
 def on_release(key):
     try:
-        pressed_keys.discard(key.char.lower())
+        if key.char:
+            pressed_keys.discard(key.char.lower())
     except:
         if key == keyboard.Key.space:
             pressed_keys.discard('space')
@@ -75,6 +88,8 @@ async def find_device():
 
 # ================= MAIN =================
 async def main():
+    global running
+
     address = await find_device()
 
     if not address:
@@ -89,9 +104,30 @@ async def main():
 
         await client.start_notify(CHAR_UUID, notification_handler)
 
-        while True:
-            cmd = build_command()
-            await client.write_gatt_char(CHAR_UUID, cmd.encode())
-            await asyncio.sleep(0.05)
+        print("\n=== CONTROL ===")
+        print("WASD + J/K = gerak")
+        print("SPACE = STOP")
+        print("Q = EXIT\n")
 
-asyncio.run(main())
+        try:
+            while running:
+                cmd = build_command()
+                await client.write_gatt_char(CHAR_UUID, cmd.encode())
+                await asyncio.sleep(0.05)
+
+        finally:
+            # 🔥 FAILSAFE STOP
+            print("Kirim STOP sebelum keluar...")
+            try:
+                await client.write_gatt_char(CHAR_UUID, b"S")
+            except:
+                pass
+
+            await client.stop_notify(CHAR_UUID)
+            print("Disconnected")
+
+# ================= RUN =================
+try:
+    asyncio.run(main())
+except KeyboardInterrupt:
+    print("\nDihentikan manual (CTRL+C)")
