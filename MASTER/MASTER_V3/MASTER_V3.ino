@@ -42,33 +42,33 @@ void loop() {
   CommunicationESP();
   if (W && D) {
     Serial.println("MAJU KANAN");
-    SwerveDrive(0.3, -0.3, 0, 0);
+    SwerveDrive(0.3, -0.3, 0, 30);
   } else if (W && A) {
     Serial.println("MAJU Kiri");
-    SwerveDrive(0.3, 0.3, 0, 0);
+    SwerveDrive(0.3, 0.3, 0, 30);
   } else if (S && D) {
     Serial.println("Mundur KANAN");
-    SwerveDrive(-0.3, -0.3, 0, 0);
+    SwerveDrive(-0.3, -0.3, 0, 30);
   } else if (S && A) {
     Serial.println("Mundur Kiri");
-    SwerveDrive(-0.3, 0.3, 0, 0);
+    SwerveDrive(-0.3, 0.3, 0, 30);
   } else if (W) {
     Serial.println("MAJU");
-    SwerveDrive(0.3, 0, 0, 20);
+    SwerveDrive(0.3, 0, 0, 30);
   } else if (S) {
     Serial.println("Mundur");
-    SwerveDrive(-0.3, 0, 0, 20);
+    SwerveDrive(-0.3, 0, 0, 30);
   } else if (A) {
     Serial.println("kiri");
-    SwerveDrive(0, 0.3, 0, 0);
+    SwerveDrive(0, 0.3, 0, 30);
   } else if (D) {
     Serial.println("kanan");
-    SwerveDrive(0, -0.3, 0, 0);
+    SwerveDrive(0, -0.3, 0, 30);
   } else if (J) {
-    SwerveDrive(0, 0, 0.3, 0);
+    SwerveDrive(0, 0, 0.3, 30);
     Serial.println("CCW");
   } else if (K) {
-    SwerveDrive(0, 0, -0.3, 0);
+    SwerveDrive(0, 0, -0.3, 30);
     Serial.println("CW");
   } else if (STOP) {
     STOP_ALL();
@@ -80,27 +80,9 @@ void loop() {
     HOME_ALL();
     Serial.println("HOMING");
   } else if (P1) {
-    // while (1) {
-    //   fedback();
-    //   Debug_odometry();
-    SwerveDrive(0.3, 0, 0, 30);
-    //   if (Fedback_Pulse[1] >= 100) {  //346
-    //     Serial.print("Tercapai MAJU 1 meter");
-    //     STOP_ALL();
-    //     break;
-    //   }
-    // }
+    ModeBuzzer(TULULIT);
   } else if (P2) {
-    // while (1) {
-    // fedback();
-    // Debug_odometry();
-    SwerveDrive(-0.3, 0, 0, 30);
-    //     if (Fedback_Pulse[1] <= -100) {  //346
-    //       Serial.print("Tercapai MUNDUR 1 meter");
-    //       STOP_ALL();
-    //       break;
-    //     }
-    //   }
+    ModeBuzzer(Armed);
   }
 }
 

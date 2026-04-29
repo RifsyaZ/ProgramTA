@@ -5,7 +5,7 @@ void MOV(float A1, float R1, float A2, float R2, float A3, float R3, float A4, f
   String cmd = "ALL:";
   cmd += String(A1, 1) + "," + String(R1, 1) + ":";
   cmd += String(A2, 1) + "," + String(R2, 1) + ":";
-  cmd += String(A3, 1) + "," + String(R3, 1) + ":";
+  cmd += String(A3, 1) + "," + String(R3, 1) + ":";//String(R3, 1)
   cmd += String(A4, 1) + "," + String(R4, 1);
 
   Serial.print("DEBUG MOV: ");
