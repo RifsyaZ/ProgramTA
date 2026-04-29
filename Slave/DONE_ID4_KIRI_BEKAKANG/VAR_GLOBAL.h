@@ -7,8 +7,8 @@
 // ==================== PIN DEFINITIONS ====================
 #define STEER_ENC_A PB1
 #define STEER_ENC_B PB2
-#define STEER_RPWM PA0 
-#define STEER_LPWM PA1 
+#define STEER_RPWM PA0
+#define STEER_LPWM PA1
 
 #define DRIVE_ENC_A PB0
 #define DRIVE_ENC_B PA7

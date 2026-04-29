@@ -1,5 +1,5 @@
-#define Sensor_49E_kiri PA4
-#define Sensor_49E_kanan PA5
+#define Sensor_49E_kiri PA5
+#define Sensor_49E_kanan PA4
 
 volatile int Arah = 1;  // Default arah = 1
 

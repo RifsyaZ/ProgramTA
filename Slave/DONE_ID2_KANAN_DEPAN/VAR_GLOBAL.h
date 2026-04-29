@@ -10,15 +10,15 @@
 #define STEER_RPWM PA0 
 #define STEER_LPWM PA1 
 
-#define DRIVE_ENC_A PA7
-#define DRIVE_ENC_B PB0
-#define DRIVE_RPWM PB7
-#define DRIVE_LPWM PB6 
+#define DRIVE_ENC_A PA7 //PA7
+#define DRIVE_ENC_B PB0 //PB0
+#define DRIVE_RPWM PB7 //PB7
+#define DRIVE_LPWM PB6 //PB6
 
 #define LED_PIN PC13
 
 // ==================== RS485 ====================
-#define RS485_SLAVE_ID 4
+#define RS485_SLAVE_ID 2
 
 // ==================== CONSTANTS ====================
 #define STEER_PULSE_PER_REV 1813.0

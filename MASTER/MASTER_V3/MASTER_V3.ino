@@ -54,20 +54,10 @@ void loop() {
     SwerveDrive(-0.3, 0.3, 0, 0);
   } else if (W) {
     Serial.println("MAJU");
-    SwerveDrive(0.3, 0, 0, 0);
+    SwerveDrive(0.3, 0, 0, 20);
   } else if (S) {
     Serial.println("Mundur");
-    // SwerveDrive(-0.3, 0, 0, 0);
-    while (1) {
-      fedback();
-      Debug_odometry();
-      SwerveDrive(0.3, 0, 0, 0);
-      if (Fedback_Pulse[1] >= 50) {//346
-        Serial.print("Tercapai 1 meter");
-        STOP_ALL();
-        break;
-      }
-    }
+    SwerveDrive(-0.3, 0, 0, 20);
   } else if (A) {
     Serial.println("kiri");
     SwerveDrive(0, 0.3, 0, 0);
@@ -89,6 +79,28 @@ void loop() {
   } else if (H) {
     HOME_ALL();
     Serial.println("HOMING");
+  } else if (P1) {
+    // while (1) {
+    //   fedback();
+    //   Debug_odometry();
+    SwerveDrive(0.3, 0, 0, 30);
+    //   if (Fedback_Pulse[1] >= 100) {  //346
+    //     Serial.print("Tercapai MAJU 1 meter");
+    //     STOP_ALL();
+    //     break;
+    //   }
+    // }
+  } else if (P2) {
+    // while (1) {
+    // fedback();
+    // Debug_odometry();
+    SwerveDrive(-0.3, 0, 0, 30);
+    //     if (Fedback_Pulse[1] <= -100) {  //346
+    //       Serial.print("Tercapai MUNDUR 1 meter");
+    //       STOP_ALL();
+    //       break;
+    //     }
+    //   }
   }
 }
 

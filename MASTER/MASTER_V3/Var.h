@@ -42,6 +42,8 @@ bool J = false;
 bool K = false;
 bool P = false;
 bool H = false;
+bool P1 = false;
+bool P2 = false;
 bool STOP = false;
 
 // ======================= KONFIGURASI ROBOT =======================

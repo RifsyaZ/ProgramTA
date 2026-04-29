@@ -4,27 +4,26 @@
 #include <Arduino.h>
 #include <STM32FreeRTOS.h>
 
-// ==================== PIN DEFINITIONS ====================
-#define STEER_ENC_A PB1 // PB2
-#define STEER_ENC_B PB2 // PB1
-#define STEER_RPWM PA0 
-#define STEER_LPWM PA1 
+#define STEER_ENC_A PB1
+#define STEER_ENC_B PB2
+#define STEER_RPWM PA1
+#define STEER_LPWM PA0
 
-#define DRIVE_ENC_A PB0 //PA7
-#define DRIVE_ENC_B PA7 //PB0
-#define DRIVE_RPWM PB6 // PB7
-#define DRIVE_LPWM PB7 //PB6
+#define DRIVE_ENC_A PA7
+#define DRIVE_ENC_B PB0
+#define DRIVE_RPWM PB7
+#define DRIVE_LPWM PB6
 
 #define LED_PIN PC13
 
 // ==================== RS485 ====================
-#define RS485_SLAVE_ID 1
+#define RS485_SLAVE_ID 3
 
 // ==================== CONSTANTS ====================
 #define STEER_PULSE_PER_REV 1813.0
-#define STEER_PWM_MAX 255
-#define STEER_BASE_PWM 80
-#define STEER_MIN_PWM 25
+#define STEER_PWM_MAX 100
+#define STEER_BASE_PWM 40  //80
+#define STEER_MIN_PWM 10   //25
 #define STEER_NUM_READINGS 3
 #define STEER_MIN_ANGLE -90.0
 #define STEER_MAX_ANGLE 90.0

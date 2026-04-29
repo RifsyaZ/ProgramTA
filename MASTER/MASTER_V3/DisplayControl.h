@@ -8,6 +8,8 @@ void parseCommand(String cmd) {
   K = false;
   P = false;
   H = false;
+  P1 = false;
+  P2 = false;
   STOP = false;
 
   cmd.trim();
@@ -29,6 +31,8 @@ void parseCommand(String cmd) {
     else if (part == "K") K = true;
     else if (part == "P") P = true;
     else if (part == "H") H = true;
+    else if (part == "P1") P1 = true;
+    else if (part == "P2") P2 = true;
     start = end + 1;
     end = cmd.indexOf(',', start);
   }
@@ -43,6 +47,8 @@ void parseCommand(String cmd) {
   else if (part == "K") K = true;
   else if (part == "P") P = true;
   else if (part == "H") H = true;
+  else if (part == "P1") P1 = true;
+  else if (part == "P2") P2 = true;
 }
 
 void CommunicationESP() {

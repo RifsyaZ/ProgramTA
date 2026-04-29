@@ -5,15 +5,15 @@
 #include <STM32FreeRTOS.h>
 
 // ==================== PIN DEFINITIONS ====================
-#define STEER_ENC_A PB1 // PB2
-#define STEER_ENC_B PB2 // PB1
+#define STEER_ENC_A PB1
+#define STEER_ENC_B PB2
 #define STEER_RPWM PA0 
 #define STEER_LPWM PA1 
 
-#define DRIVE_ENC_A PB0 //PA7
-#define DRIVE_ENC_B PA7 //PB0
-#define DRIVE_RPWM PB6 // PB7
-#define DRIVE_LPWM PB7 //PB6
+#define DRIVE_ENC_A PA7 //PB0
+#define DRIVE_ENC_B PB0 //PA7
+#define DRIVE_RPWM PB7 //PB6
+#define DRIVE_LPWM PB6 //PB7
 
 #define LED_PIN PC13
 
