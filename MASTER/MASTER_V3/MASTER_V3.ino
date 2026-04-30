@@ -2,8 +2,9 @@
 #include "Var.h"
 #include "Sensor_Odometry.h"
 #include "SwerveDrive.h"
-#include "Plan.h"
+#include "PID.h"
 #include "DisplayControl.h"
+#include "Plan.h"
 
 // ==================== SETUP ====================
 void setup() {
@@ -40,18 +41,49 @@ void loop() {
   fedback();
   Debug_odometry();
   CommunicationESP();
-  // if (Serial.available()) {
-//   String cmd = Serial.readStringUntil('\n');
-//   cmd.trim();
-//   if (cmd.length() == 0) return;
-
-//   cmd.toUpperCase();
-//   if (cmd == "G") {
-//     TEST(0);
-//   } else if (cmd == "S") {
-//     STOP_ALL();
-//   } else if (cmd == "H") {
-//     HOME_ALL();
-//   }
-// }
+  if (W && D) {
+    Serial.println("MAJU KANAN");
+    SwerveDrive(0.3, -0.3, 0, 30);
+  } else if (W && A) {
+    Serial.println("MAJU Kiri");
+    SwerveDrive(0.3, 0.3, 0, 30);
+  } else if (S && D) {
+    Serial.println("Mundur KANAN");
+    SwerveDrive(-0.3, -0.3, 0, 30);
+  } else if (S && A) {
+    Serial.println("Mundur Kiri");
+    SwerveDrive(-0.3, 0.3, 0, 30);
+  } else if (W) {
+    Serial.println("MAJU");
+    // SwerveDrive(0.3, 0, 0, 30);
+    PID(F_GY, 50, 180, 100);
+  } else if (S) {
+    Serial.println("Mundur");
+    SwerveDrive(-0.3, 0, 0, 30);
+  } else if (A) {
+    Serial.println("kiri");
+    SwerveDrive(0, 0.3, 0, 30);
+  } else if (D) {
+    Serial.println("kanan");
+    SwerveDrive(0, -0.3, 0, 30);
+  } else if (J) {
+    SwerveDrive(0, 0, 0.3, 30);
+    Serial.println("CCW");
+  } else if (K) {
+    SwerveDrive(0, 0, -0.3, 30);
+    Serial.println("CW");
+  } else if (STOP) {
+    STOP_ALL();
+    Serial.println("Stop");
+  } else if (P) {
+    STOP_ALL();
+    Serial.println("Stop");
+  } else if (H) {
+    HOME_ALL();
+    Serial.println("HOMING");
+  } else if (P1) {
+    ModeBuzzer(TULULIT);
+  } else if (P2) {
+    ModeBuzzer(Armed);
+  }
 }

@@ -5,7 +5,7 @@ void MOV(float A1, float R1, float A2, float R2, float A3, float R3, float A4, f
   String cmd = "ALL:";
   cmd += String(A1, 1) + "," + String(R1, 1) + ":";
   cmd += String(A2, 1) + "," + String(R2, 1) + ":";
-  cmd += String(A3, 1) + "," + String(R3, 1) + ":";//String(R3, 1)
+  cmd += String(A3, 1) + "," + String(R3, 1) + ":";  //String(R3, 1)
   cmd += String(A4, 1) + "," + String(R4, 1);
 
   Serial.print("DEBUG MOV: ");
@@ -52,6 +52,9 @@ void HOME_ALL() {
 // Vy = kecepatan translasi robot terhadap sumbu y kiri/kanan (m/s)
 // Wz = kecepatan sudut rotasi robot terhadap sumbu Z (rad/s), sama dengan omega
 void SwerveDrive(float Vx, float Vy, float Wz, float max_rpm) {
+  MPU1();
+  fedback();
+  Debug_odometry();
   fedback();
   float target_angle[4];
   float target_rpm[4];
@@ -69,7 +72,7 @@ void SwerveDrive(float Vx, float Vy, float Wz, float max_rpm) {
     float rpm = rps * 60.0f;
 
     float raw_angle = atan2f(vy_i, vx_i);                  // ROS: phii = atan2(vy_i, vx_i)
-    float angle_deg = 360.0f - (raw_angle * 180.0f / PI);  // ROS: angle_deg = raw_angle * 180/PI
+    float angle_deg = 360.0f - (raw_angle * 180.0f / PI);  //float angle_deg = 180.0f - (raw_angle * 180.0f / PI);  //float angle_deg = 360.0f - (raw_angle * 180.0f / PI);  // ROS: angle_deg = raw_angle * 180/PI
     while (angle_deg < 0) angle_deg += 360.0f;
     while (angle_deg >= 360) angle_deg -= 360.0f;
 
@@ -98,114 +101,46 @@ void SwerveDrive(float Vx, float Vy, float Wz, float max_rpm) {
     }
   }
 
-  MOV(target_angle[0], target_rpm[0],   // ID1 FL
-      target_angle[1], target_rpm[1],   // ID2 FR
-      target_angle[3], target_rpm[3],   // ID3 RR
-      target_angle[2], target_rpm[2]);  // ID4 RL
+  MOV(target_angle[0], target_rpm[0],   // ID1 FL = index 0
+      target_angle[1], target_rpm[1],   // ID2 FR = index 1
+      target_angle[3], target_rpm[3],   // ID3 RR = index 3
+      target_angle[2], target_rpm[2]);  // ID4 RL = index 2
 }
 
-// void SwerveDrive(float Vx, float Vy, float Wz, float max_rpm) {
-//   float target_angle[4];
-//   float target_rpm[4];
+void SwervePolar(float speedRPM, float angle, float rotSpeed, float maxRPM) {
+  MPU1();
+  fedback();
+  Debug_odometry();
+  // speedRPM: kecepatan dalam RPM yang diinginkan
+  float sudutRad = angle * (PI / 180.0f);
+  float Wz = rotSpeed * (PI / 180.0f);
 
-//   for (int i = 0; i < 4; i++) {
-//     float x = module_x[i];
-//     float y = module_y[i];
+  // Konversi RPM ke m/s
+  float speed_ms = (speedRPM * 2.0f * PI * R_WHEEL) / 60.0f;
 
-//     float vx_i = Vx - (Wz * y);  // ROS: vx_i = Vx - Wz * li_y
-//     float vy_i = Vy + (Wz * x);  // ROS: vy_i = Vy + Wz * li_x
+  float Vx = speed_ms * cos(sudutRad);
+  float Vy = -speed_ms * sin(sudutRad);
 
-//     // Kecepatan total pada modul (resultant) untuk konversi ke putaran roda
-//     float speed_ms = sqrtf(vx_i * vx_i + vy_i * vy_i);  // ROS: vi = sqrt(vx_i^2 + vy_i^2)
-//     float rps = speed_ms / (2.0f * PI * R_WHEEL);
-//     float rpm = rps * 60.0f;
+  SwerveDrive(Vx, Vy, Wz, maxRPM);
+}
 
-//     float raw_angle = atan2f(vy_i, vx_i);  // ROS: phii = atan2(vy_i, vx_i)
 
-//     float prev_ros = 360.0f - prev_angle[i];  // ROS: prev_ros = prev_angle[i]
-//     if (prev_ros >= 360.0f) prev_ros -= 360.0f;
+void turnnSwerve(float SPD_rpm, float turnX, float max_rpm) {
+  MPU1();
+  fedback();
+  Debug_odometry();
+  float turnRadius = fabsf(turnX) / 1000.0;
+  float speed_ms = (SPD_rpm * 2.0f * PI * R_WHEEL) / 60.0f;
 
-//     float delta = raw_angle - (prev_ros * PI / 180.0f);
-//     while (delta > PI) delta -= 2 * PI;
-//     while (delta < -PI) delta += 2 * PI;
-
-//     if (fabsf(delta) > PI / 2.0f) {
-//       raw_angle += PI;
-//     }
-
-//     float angle_deg = 360.0f - (raw_angle * 180.0f / PI);  // ROS: angle_deg = raw_angle * 180/PI
-//     while (angle_deg < 0) angle_deg += 360.0f;
-//     while (angle_deg >= 360) angle_deg -= 360.0f;
-
-//     target_angle[i] = angle_deg;
-//     target_rpm[i] = fabsf(rpm);  // ROS: target_rpm[i] = rpm
-//     prev_angle[i] = angle_deg;
-//   }
-
-//   float max_abs_rpm = 0;
-//   for (int i = 0; i < 4; i++) {
-//     if (target_rpm[i] > max_abs_rpm) {  // ROS: fabsf(target_rpm[i])
-//       max_abs_rpm = target_rpm[i];
-//     }
-//   }
-//   if (max_abs_rpm > max_rpm) {
-//     float scale = max_rpm / max_abs_rpm;
-//     for (int i = 0; i < 4; i++) {
-//       target_rpm[i] *= scale;
-//     }
-//   }
-
-//   MOV(target_angle[0], target_rpm[0],   // ID1 FL
-//       target_angle[1], target_rpm[1],   // ID2 FR
-//       target_angle[3], target_rpm[3],   // ID3 RR
-//       target_angle[2], target_rpm[2]);  // ID4 RL
-// }
-
-// MOV_Radius: gerak melingkar dengan body mengikuti arah radius
-void MOV_Radius(float Vx, float Vy, float max_rpm, float radius) {
-  float used_wz = 0.0f;
-  if (radius != 0.0f) {
-    float V = sqrtf(Vx * Vx + Vy * Vy);
-    if (V > 0.0f) {
-      used_wz = (radius > 0.0f ? 1.0f : -1.0f) * (V / fabsf(radius));
+  if (turnRadius > 0.001f) {
+    float omega = speed_ms / turnRadius;
+    if (turnX > 0) {
+      SwerveDrive(speed_ms, 0, -omega, max_rpm);  // Kanan //+
+    } else {
+      SwerveDrive(speed_ms, 0, omega, max_rpm);  // Kiri //-
     }
+  } else {
+    // SwervePolar(SPD_rpm, 0, 0, max_rpm);  // Lurus
+    Serial.println("Radius belok tidak valid.");
   }
-
-  SwerveDrive(Vx, Vy, used_wz, max_rpm);
-}
-
-// MOV_CurveFixedHeading: heading robot tetap, path mengikuti kurva dengan kecepatan yang berubah setiap loop.
-// Panggil fungsi ini berulang di loop utama agar robot mempertahankan radius yang diinginkan.
-// Contoh: MOV_CurveFixedHeading(0.3f, 0.0f, 100.0f, 1.0f);
-void MOV_CurveFixedHeading(float Vx, float Vy, float max_rpm, float radius) {
-  float V = sqrtf(Vx * Vx + Vy * Vy);
-  if (V <= 0.0f || radius == 0.0f) {
-    SwerveDrive(Vx, Vy, 0.0f, max_rpm);
-    return;
-  }
-
-  static float curve_phase = 0.0f;
-  static unsigned long last_curve_time = 0;
-  static float last_radius = 0.0f;
-  static float last_speed = 0.0f;
-
-  unsigned long now = millis();
-  if (last_curve_time == 0 || last_radius != radius || fabsf(last_speed - V) > 0.001f) {
-    curve_phase = atan2f(Vy, Vx);
-    last_curve_time = now;
-    last_radius = radius;
-    last_speed = V;
-  }
-
-  float dt = (now - last_curve_time) * 0.001f;
-  if (dt > 0.0f) {
-    float direction = (radius > 0.0f) ? 1.0f : -1.0f;
-    curve_phase += direction * (V / fabsf(radius)) * dt;
-    last_curve_time = now;
-  }
-
-  float used_vx = V * cosf(curve_phase);
-  float used_vy = V * sinf(curve_phase);
-
-  SwerveDrive(used_vx, used_vy, 0.0f, max_rpm);
 }

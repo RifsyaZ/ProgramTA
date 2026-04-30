@@ -38,7 +38,7 @@ bool W = false;
 bool S = false;
 bool A = false;
 bool D = false;
-bool J = false; 
+bool J = false;
 bool K = false;
 bool P = false;
 bool H = false;
@@ -46,7 +46,12 @@ bool P1 = false;
 bool P2 = false;
 bool STOP = false;
 
+// ============== PID ==================
+#define F_GY 1
+
 // ======================= KONFIGURASI ROBOT =======================
+float MAX_RPM = 200;
+
 #define PI 3.14159265359f
 #define R_WHEEL 0.0225f  // Jari-jari roda (45mm / 2)
 
