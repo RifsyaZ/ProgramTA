@@ -117,7 +117,7 @@ void homing_resetEncoder() {
 
 static void homing_calculateRpm() {
   unsigned long now = millis();
-  if (now - lastRpmTime < 50) return;
+  if (now - lastRpmTime < 250) return;
 
   int32_t currentCount;
   noInterrupts();

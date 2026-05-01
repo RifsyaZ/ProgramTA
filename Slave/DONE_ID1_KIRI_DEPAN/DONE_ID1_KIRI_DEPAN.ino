@@ -131,6 +131,10 @@ void setup() {
   //   xTaskCreate(autoRunTask, "AutoRun", 256, NULL, 1, NULL);
   // }
 
+  for (int a = 0; a <= 10; a++) {
+    homing_moveToHome();
+  }
+
   vTaskStartScheduler();
 }
 

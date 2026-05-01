@@ -37,40 +37,43 @@ void setup() {
 
 // ==================== LOOP ====================
 void loop() {
-  MPU1();
-  fedback();
-  Debug_odometry();
+  // MPU1();
+  // fedback();
+  // Debug_odometry();
   CommunicationESP();
-  if (W && D) {
-    Serial.println("MAJU KANAN");
-    SwerveDrive(0.3, -0.3, 0, 30);
-  } else if (W && A) {
-    Serial.println("MAJU Kiri");
-    SwerveDrive(0.3, 0.3, 0, 30);
-  } else if (S && D) {
-    Serial.println("Mundur KANAN");
-    SwerveDrive(-0.3, -0.3, 0, 30);
-  } else if (S && A) {
-    Serial.println("Mundur Kiri");
-    SwerveDrive(-0.3, 0.3, 0, 30);
-  } else if (W) {
-    Serial.println("MAJU");
-    // SwerveDrive(0.3, 0, 0, 30);
-    PID(F_GY, 50, 180, 100);
+  // if (W && D) {
+  //   Serial.println("MAJU KANAN");
+  //   SwerveDrive(0.3, -0.3, 0, 20);
+  // } else if (W && A) {
+  //   Serial.println("MAJU Kiri");
+  //   SwerveDrive(0.3, 0.3, 0, 20);
+  // } else if (S && D) {
+  //   Serial.println("Mundur KANAN");
+  //   SwerveDrive(-0.3, -0.3, 0, 20);
+  // } else if (S && A) {
+  //   Serial.println("Mundur Kiri");
+  //   SwerveDrive(-0.3, 0.3, 0, 20);
+  // }]/
+  if (W) {
+    // Serial.println("MAJU");
+    // SwerveDrive(0.3, 0, 0, 20);
+    PID(F_GY, 50, 180, 60);
   } else if (S) {
     Serial.println("Mundur");
-    SwerveDrive(-0.3, 0, 0, 30);
-  } else if (A) {
-    Serial.println("kiri");
-    SwerveDrive(0, 0.3, 0, 30);
-  } else if (D) {
-    Serial.println("kanan");
-    SwerveDrive(0, -0.3, 0, 30);
-  } else if (J) {
-    SwerveDrive(0, 0, 0.3, 30);
+    SwerveDrive(-0.3, 0, 0, 100);
+  }
+  // else if (A) {
+  //   Serial.println("kiri");
+  //   SwerveDrive(0, 0.3, 0, 20);
+  // } else if (D) {
+  //   Serial.println("kanan");
+  //   SwerveDrive(0, -0.3, 0, 20);
+  // }
+  else if (J) {
+    SwerveDrive(0, 0, 0.3, 20);
     Serial.println("CCW");
   } else if (K) {
-    SwerveDrive(0, 0, -0.3, 30);
+    SwerveDrive(0, 0, -0.3, 20);
     Serial.println("CW");
   } else if (STOP) {
     STOP_ALL();
@@ -78,12 +81,14 @@ void loop() {
   } else if (P) {
     STOP_ALL();
     Serial.println("Stop");
-  } else if (H) {
-    HOME_ALL();
-    Serial.println("HOMING");
-  } else if (P1) {
-    ModeBuzzer(TULULIT);
-  } else if (P2) {
-    ModeBuzzer(Armed);
   }
+  // else if (H) {
+  //   HOME_ALL();
+  //   Serial.println("HOMING");
+  // } else if (P1) {
+  //   ModeBuzzer(TULULIT);
+  // } else if (P2) {
+  //   ModeBuzzer(Armed);
+  // }
+  // turnnSwerve(30, 1, 50);
 }

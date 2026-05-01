@@ -11,22 +11,22 @@ void MOV(float A1, float R1, float A2, float R2, float A3, float R3, float A4, f
   Serial.print("DEBUG MOV: ");
   Serial.println(cmd);
   Serial1.println(cmd);
-  Serial.print("A1=");
-  Serial.print(A1, 1);
-  Serial.print(" R1=");
-  Serial.println(R1, 1);
-  Serial.print(" A2=");
-  Serial.print(A2, 1);
-  Serial.print(" R2=");
-  Serial.println(R2, 1);
-  Serial.print(" A3=");
-  Serial.print(A3, 1);
-  Serial.print(" R3=");
-  Serial.println(R3, 1);
-  Serial.print(" A4=");
-  Serial.print(A4, 1);
-  Serial.print(" R4=");
-  Serial.println(R4, 1);
+  // Serial.print("A1=");
+  // Serial.print(A1, 1);
+  // Serial.print(" R1=");
+  // Serial.println(R1, 1);
+  // Serial.print(" A2=");
+  // Serial.print(A2, 1);
+  // Serial.print(" R2=");
+  // Serial.println(R2, 1);
+  // Serial.print(" A3=");
+  // Serial.print(A3, 1);
+  // Serial.print(" R3=");
+  // Serial.println(R3, 1);
+  // Serial.print(" A4=");
+  // Serial.print(A4, 1);
+  // Serial.print(" R4=");
+  // Serial.println(R4, 1);
 }
 
 //---------------------- SET KE SUDUT 0 DAN RPM RODA 0 ----------------------//
@@ -54,7 +54,7 @@ void HOME_ALL() {
 void SwerveDrive(float Vx, float Vy, float Wz, float max_rpm) {
   MPU1();
   fedback();
-  Debug_odometry();
+  // Debug_odometry();
   fedback();
   float target_angle[4];
   float target_rpm[4];
@@ -129,10 +129,10 @@ void turnnSwerve(float SPD_rpm, float turnX, float max_rpm) {
   MPU1();
   fedback();
   Debug_odometry();
-  float turnRadius = fabsf(turnX) / 1000.0;
+  float turnRadius = fabsf(turnX) / 100.0;
   float speed_ms = (SPD_rpm * 2.0f * PI * R_WHEEL) / 60.0f;
 
-  if (turnRadius > 0.001f) {
+  if (turnRadius != 0.0f) {
     float omega = speed_ms / turnRadius;
     if (turnX > 0) {
       SwerveDrive(speed_ms, 0, -omega, max_rpm);  // Kanan //+

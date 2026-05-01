@@ -128,7 +128,7 @@ void runCalibration() {
   mpu.setZGyroOffset(0);
 
   int buffersize = 1000;
-  int acel_deadzone = 5;
+  int acel_deadzone = 8;
   int giro_deadzone = 1;
 
   int16_t ax, ay, az, gx, gy, gz;

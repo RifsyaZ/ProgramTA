@@ -75,29 +75,29 @@ void fedback() {
 }
 
 void Debug_odometry() {
-  Serial.print(Fedback_Angle[0]);
-  Serial.print(" ");
-  Serial.print(Fedback_Pulse[0]);
+  // Serial.print(Fedback_Angle[0]);
+  // Serial.print(" ");
+  // Serial.print(Fedback_Pulse[0]);
 
-  Serial.print("        ");
+  // Serial.print("        ");
 
-  Serial.print(Fedback_Angle[1]);
-  Serial.print(" ");
-  Serial.print(Fedback_Pulse[1]);
+  // Serial.print(Fedback_Angle[1]);
+  // Serial.print(" ");
+  // Serial.print(Fedback_Pulse[1]);
 
-  Serial.print("        ");
+  // Serial.print("        ");
 
-  Serial.print(Fedback_Angle[2]);
-  Serial.print(" ");
-  Serial.print(Fedback_Pulse[2]);
+  // Serial.print(Fedback_Angle[2]);
+  // Serial.print(" ");
+  // Serial.print(Fedback_Pulse[2]);
 
-  Serial.print("        ");
+  // Serial.print("        ");
 
-  Serial.print(Fedback_Angle[3]);
-  Serial.print(" ");
-  Serial.print(Fedback_Pulse[3]);
+  // Serial.print(Fedback_Angle[3]);
+  // Serial.print(" ");
+  // Serial.print(Fedback_Pulse[3]);
 
-  Serial.print("        ");
+  // Serial.print("        ");
 
   Serial.print(yaw);
 

@@ -120,7 +120,7 @@ void setWheelSpeeds2(float v, float omega, float v_lateral) {
   Serial.print("CEK Roda Belakang Kanan : "); Serial.println(wheelSpeed4);
 
   // Sesuaikan arah berdasarkan tanda kecepatan
-  analogWrite(DKI1, omega_front_right >= 0 ? wheelSpeed1 : 0);
+  analogWrite(DKI1, omewga_front_right >= 0 ? wheelSpeed1 : 0);
   analogWrite(DKI2, omega_front_right < 0 ? wheelSpeed1 : 0);
   analogWrite(BKI1, omega_back_right >= 0 ? wheelSpeed2 : 0);
   analogWrite(BKI2, omega_back_right < 0 ? wheelSpeed2 : 0);
